@@ -47,6 +47,20 @@ class RecipeCreate(BaseModel):
     ingredients: list[RecipeIngredientCreate] = []
     insructions: list[RecipeInstructionCreate] = []
 
+class RecipeUpdate(BaseModel):
+    title: str | None = None 
+    description: str | None = None 
+    servings: int | None = None 
+    prep_time_minutes: int | None = None 
+    cook_time_minutes: int | None = None 
+    cuisine: list[str] | None = None 
+    tags: list[str] | None = None 
+    notes: list[str] | None = None 
+    source_type: str | None = None 
+    source_url: str | None = None 
+    ingredients: list[RecipeIngredientCreate] | None = None 
+    instructions: list[RecipeInstructionCreate] | None = None 
+
 class RecipeRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
