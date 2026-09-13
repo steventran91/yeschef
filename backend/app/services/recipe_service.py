@@ -1,5 +1,5 @@
 from sqlalchemy import select 
-from sql.alchemy.orm import Session 
+from sqlalchemy.orm import Session 
 from app.models.recipe import Recipe, RecipeIngredient, RecipeInstruction
 from app.schemas.recipe import RecipeCreate, RecipeUpdate
 
@@ -17,7 +17,7 @@ def create_recipe(db: Session, data: RecipeCreate) -> Recipe:
         source_url=data.source_url,
     )
 
-    for i, ingredient in enumerate(recipe.ingredients):
+    for i, ingredient in enumerate(data.ingredients):
         recipe.ingredients.append(
             RecipeIngredient(
                 name=ingredient.name,
@@ -25,14 +25,14 @@ def create_recipe(db: Session, data: RecipeCreate) -> Recipe:
                 quantity=ingredient.quantity,
                 unit=ingredient.unit,
                 preparation=ingredient.preparation,
-                section=ingredient.sections,
+                section=ingredient.section,
                 is_optional=ingredient.is_optional,
                 position=i,
             )
         )
 
-    for i, instruction in enumerate(recipe.instructions):
-        recipe.ingredients.append(
+    for i, instruction in enumerate(data.instructions):
+        recipe.instructions.append(
             RecipeInstruction(
                 text=instruction.text,
                 step_number=i + 1
@@ -48,7 +48,7 @@ def get_recipe(db: Session, recipe_id):
     recipe = db.get(Recipe, recipe_id)
     return recipe
 
-def list_recipe(db: Session, include_archived: bool = False) -> list[Recipe]:
+def list_recipes(db: Session, include_archived: bool = False) -> list[Recipe]:
     query = select(Recipe)
     if not include_archived:
         query = query.where(Recipe.is_archived.is_(False))
@@ -65,14 +65,14 @@ def update_recipe(db: Session, recipe_id: int, data: RecipeUpdate) -> Recipe | N
 
     if data.ingredients is not None:
         recipe.ingredients.clear()
-        for i, ingredient in enumerate(recipe.ingredients):
+        for i, ingredient in enumerate(data.ingredients):
             recipe.ingredients.append(
                 RecipeIngredient(
                     name=ingredient.name,
                     original_text=ingredient.original_text,
                     quantity=ingredient.quantity,
                     unit=ingredient.unit,
-                    preparations=ingredient.preparations,
+                    preparation=ingredient.preparation,
                     section=ingredient.section,
                     is_optional=ingredient.is_optional,
                     position=i,
@@ -81,7 +81,7 @@ def update_recipe(db: Session, recipe_id: int, data: RecipeUpdate) -> Recipe | N
 
     if data.instructions is not None:
         recipe.instructions.clear()
-        for i, instruction in enumerate(recipe.instructions):
+        for i, instruction in enumerate(data.instructions):
             recipe.instructions.append(
                 RecipeInstruction(
                     text=instruction.text,

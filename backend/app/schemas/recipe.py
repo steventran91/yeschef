@@ -8,7 +8,7 @@ class RecipeIngredientCreate(BaseModel):
     unit: str | None = None 
     preparation: str | None = None 
     section: str | None = None 
-    is_optoinal: bool = False 
+    is_optional: bool = False 
 
 class RecipeIngredientRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -45,7 +45,7 @@ class RecipeCreate(BaseModel):
     source_type: str = "manual"
     source_url: str | None = None 
     ingredients: list[RecipeIngredientCreate] = []
-    insructions: list[RecipeInstructionCreate] = []
+    instructions: list[RecipeInstructionCreate] = []
 
 class RecipeUpdate(BaseModel):
     title: str | None = None 
