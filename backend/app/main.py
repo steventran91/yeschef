@@ -1,17 +1,12 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 from app.db.session import engine
-from app.db.base import Base
 from app.models import recipe 
 from app.api.recipes import router as recipes_router
 
 
 app = FastAPI(title="yeschef")
 app.include_router(recipes_router)
-
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)
 
 @app.get("/health")
 def health():
