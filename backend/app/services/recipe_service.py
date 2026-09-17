@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from app.models.recipe import Recipe, RecipeIngredient, RecipeInstruction
 from app.schemas.recipe import RecipeCreate, RecipeUpdate
 
-def create_recipe(db: Session, data: RecipeCreate) -> Recipe:
+def create_recipe(db: Session, data: RecipeCreate, user_id: int) -> Recipe:
     recipe = Recipe(
+        user_id=user_id,
         title=data.title,
         description=data.description,
         servings=data.servings,
@@ -44,18 +45,19 @@ def create_recipe(db: Session, data: RecipeCreate) -> Recipe:
     db.refresh(recipe)
     return recipe
 
-def get_recipe(db: Session, recipe_id):
-    recipe = db.get(Recipe, recipe_id)
+def get_recipe(db: Session, recipe_id: int, user_id: int):
+    query = select(Recipe).where(Recipe.id == recipe_id, Recipe.user_id == user_id)
+    recipe = db.execute(query).scalar_one_or_none()
     return recipe
 
-def list_recipes(db: Session, include_archived: bool = False) -> list[Recipe]:
-    query = select(Recipe)
+def list_recipes(db: Session, user_id: int, include_archived: bool = False) -> list[Recipe]:
+    query = select(Recipe).where(Recipe.user_id == user_id)
     if not include_archived:
         query = query.where(Recipe.is_archived.is_(False))
     return list(db.execute(query).scalars().all())
 
-def update_recipe(db: Session, recipe_id: int, data: RecipeUpdate) -> Recipe | None:
-    recipe = db.get(Recipe, recipe_id)
+def update_recipe(db: Session, recipe_id: int, user_id: int, data: RecipeUpdate) -> Recipe | None:
+    recipe = get_recipe(db, recipe_id, user_id)
     if recipe is None:
         return None 
 
@@ -93,8 +95,8 @@ def update_recipe(db: Session, recipe_id: int, data: RecipeUpdate) -> Recipe | N
     db.refresh(recipe)
     return recipe 
 
-def archive_recipe(db: Session, recipe_id: int) -> Recipe | None:
-    recipe = db.get(Recipe, recipe_id)
+def archive_recipe(db: Session, recipe_id: int, user_id: int) -> Recipe | None:
+    recipe = get_recipe(db, recipe_id, user_id)
     if recipe is None:
         return None 
     recipe.is_archived = True
