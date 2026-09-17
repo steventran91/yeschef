@@ -2,11 +2,13 @@ from datetime import datetime, timezone
 from sqlalchemy import ARRAY, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base 
+from app.models.user import User
 
 class Recipe(Base):
     __tablename__ = "recipes"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     servings: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -29,6 +31,7 @@ class Recipe(Base):
     instructions: Mapped[list["RecipeInstruction"]] = relationship(
         back_populates="recipe", cascade="all, delete-orphan", order_by="RecipeInstruction.step_number"
     )
+    owner: Mapped["User"] = relationship(back_populates="recipes")
 
 class RecipeIngredient(Base):
     __tablename__ = "recipe_ingredients"
