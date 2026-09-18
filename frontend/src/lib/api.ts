@@ -43,7 +43,7 @@ export function login(email: string, password: string) {
 export function register(data: {first_name: string; last_name: string; email: string; password: string}) {
     return apiFetch("/auth/register", {
         method: "POST",
-        body: JSON.stringify({data}),
+        body: JSON.stringify(data),
     });
 }
 

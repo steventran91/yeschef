@@ -10,7 +10,7 @@ from app.schemas.user import UserRegister, UserLogin, UserRead, Token
 
 router = APIRouter()
 
-@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+@router.post("/auth/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserRegister, db: Session = Depends(get_db)):
     user = User(
         first_name=user_in.first_name,
@@ -28,7 +28,7 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
     token = create_access_token(user.id)
     return Token(access_token=token, token_type="bearer")
 
-@router.post("/login", response_model=Token)
+@router.post("/auth/login", response_model=Token)
 def login(login_request: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == login_request.email).first()
     if not user or not verify_password(login_request.password, user.password_hash):
@@ -37,6 +37,6 @@ def login(login_request: UserLogin, db: Session = Depends(get_db)):
     token = create_access_token(user.id)
     return Token(access_token=token, token_type="bearer")
 
-@router.get("/me", response_model=UserRead)
+@router.get("/auth/me", response_model=UserRead)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
