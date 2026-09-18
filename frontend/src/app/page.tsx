@@ -24,6 +24,11 @@ export default function Home() {
     setChecked(true);
   }
 
+  function handleLogout() {
+    clearToken();
+    setUser(null);
+  }
+
   useEffect(() => {
     loadUser();
   }, []);
@@ -43,9 +48,12 @@ export default function Home() {
     );
   }
 
+  const backButtonClass = "w-full text-center text-xs text-[#7C9074]/70 hover:text-[#7C9074]";
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#F1EAE0] p-4">
       <h1 className="text-2xl font-bold text-[#7C9074]">Welcome, {user.first_name}</h1>
+      <button onClick={handleLogout} className={backButtonClass}>Logout</button>
     </main>
   );
 }
