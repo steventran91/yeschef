@@ -51,6 +51,10 @@ export function getRecipes() {
     return apiFetch("/recipes");
 }
 
+export function getRecipe(id: string | number) {
+    return apiFetch(`/recipes/${id}`);
+}
+
 export function getMe() {
     return apiFetch("/auth/me");
 }
