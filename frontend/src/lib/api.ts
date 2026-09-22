@@ -47,6 +47,10 @@ export function register(data: {first_name: string; last_name: string; email: st
     });
 }
 
+export function getRecipes() {
+    return apiFetch("/recipes");
+}
+
 export function getMe() {
     return apiFetch("/auth/me");
 }
