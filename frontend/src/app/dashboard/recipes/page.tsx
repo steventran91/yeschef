@@ -41,7 +41,7 @@ export default function RecipesPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full max-w-sm rounded-md border border-[#7C9074]/40 bg-white/60 px-2 text-sm text-[#4B5A44] placeholder:text-[#7C9074]/60 focus:outline-none focus:ring-2 focus:ring-[#7C9074]/50"
                 />
-            <Link href="/dashboard/recipes/new" className="text-[#7C9074] font-medium hover:underline">+ New Recipe</Link>
+            <Link href="/dashboard/recipes/new" className="text-[#7C9074] font-medium hover:underline ml-2">+ New Recipe</Link>
     {filteredRecipes.length === 0 ? (
         <p className="text-[#7C9074]/70">No recipes found.</p>
     ) : (
@@ -50,13 +50,13 @@ export default function RecipesPage() {
                 <li key={recipe.id}>
                     <Link
                         href={`/dashboard/recipes/${recipe.id}`}
-                        className="flex items-center gap-4 rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
+                        className="flex min-h-[128px] items-start gap-4 rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
                     >
                         {recipe.image_url ? (
                             <img
                                 src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
                                 alt={recipe.title}
-                                className="h-20 w-20 flex-shrink-0 rounded-md object-cover m-4"
+                                className="h-20 w-20 flex-shrink-0 rounded-md object-cover"
                             />
                         ) : (
                             <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-md border border-dashed border-[#7C9074]/40 text-xs text-[#7C9074]/50">
