@@ -23,6 +23,12 @@ function RecipeCreateForm() {
         is_optional?: boolean;
     }[]>([]);
 
+    function updateIngredient(index: number, field: string, value: string | number | boolean) {
+        const updated = [...ingredients];
+        updated[index] = {...updated[index], [field]: value};
+        setIngredients(updated);
+    }
+
 
     return (
         <div>
@@ -43,6 +49,54 @@ function RecipeCreateForm() {
                     <span key={t}>{t}</span>
                 ))}
                 <button type="button" onClick={() => {setIngredients([...ingredients, {name: "", original_text: "",  quantity: undefined, unit: "", preparation: "", section: "", is_optional: false }])}}>Add Ingredient</button>
+                {ingredients.map((ingredient, index) => (
+                    <div key={index}>
+                        <input 
+                            type="text"
+                            placeholder="Ingredient name"
+                            value={ingredient.name}
+                            onChange={(e) => updateIngredient(index, "name", e.target.value)}
+                        />
+                        <input 
+                            type="text"
+                            placeholder="Original text (e.g. 2 tbsp soy sauce)"
+                            value={ingredient.original_text}
+                            onChange={(e) => updateIngredient(index, "original_text", e.target.value)}
+                        />
+                        <input 
+                            type="number"
+                            placeholder="Quantity"
+                            value={ingredient.quantity ?? ""}
+                            onChange={(e) => updateIngredient(index, "quantity", e.target.value)}
+                        />
+                        <input 
+                            type="text"
+                            placeholder="Unit"
+                            value={ingredient.unit}
+                            onChange={(e) => updateIngredient(index, "unit", e.target.value)}
+                        />
+                        <input 
+                            type="text"
+                            placeholder="Preparation"
+                            value={ingredient.preparation}
+                            onChange={(e) => updateIngredient(index, "preparation", e.target.value)}
+                        />
+                        <input 
+                            type="text"
+                            placeholder="Section"
+                            value={ingredient.section}
+                            onChange={(e) => updateIngredient(index, "section", e.target.value)}
+                        />
+                        <label>
+                            <input 
+                                type="checkbox"
+                                checked={ingredient.is_optional}
+                                onChange={(e) => updateIngredient(index, "is_optional", e.target.checked)}
+                            />
+                            Optional
+                        </label>
+                    </div>
+                ))}
                 <button type="submit">Create</button>
             </form>
         </div>
