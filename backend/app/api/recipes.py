@@ -34,7 +34,7 @@ def update_recipe(recipe_id: int, data: RecipeUpdate, db: Session = Depends(get_
     return recipe
 
 @router.post("/recipes/{recipe_id}/image", response_model=RecipeRead)
-async def upload_recipe_image(recipe_id: int, file: UploadFile = File(...), db: Session = Depends(get_current_user), current_user: User = Depends(get_current_user)):
+async def upload_recipe_image(recipe_id: int, file: UploadFile = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     recipe = recipe_service.get_recipe(db, recipe_id, current_user.id)
     if recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
