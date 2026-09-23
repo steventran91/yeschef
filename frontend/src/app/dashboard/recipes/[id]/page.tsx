@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { getRecipe } from "@/lib/api";
+import { getRecipe, uploadRecipeImage } from "@/lib/api";
 
 type Ingredient = {
     id: number,
@@ -32,6 +32,7 @@ type Recipe = {
     tags: string[];
     ingredients: Ingredient[];
     instructions: Instruction[];
+    image_url: string | null;
 }
 
 export default function RecipeDetailPage() {
@@ -41,6 +42,8 @@ export default function RecipeDetailPage() {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         getRecipe(id)
@@ -49,12 +52,56 @@ export default function RecipeDetailPage() {
           .finally(() => setLoading(false));
     }, [id]);
 
+    async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file || !recipe) return;
+
+        setUploading(true);
+        try {
+            const updated = await uploadRecipeImage(recipe.id, file);
+            setRecipe(updated);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to upload image");
+        } finally {
+            setUploading(false);
+        }
+    }
+
     if (loading) return <p className="text-[#7C9074]">Loading...</p>
     if (error) return <p className="text-red-600">{error}</p>
     if (!recipe) return null;
 
     return (
         <div className="space-y-6">
+            <div>
+                {recipe.image_url ? (
+                    <img
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
+                        alt={recipe.title}
+                        className="h-48 w-full rounded-lg object-cover"
+                    />
+                ) : (
+                    <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed border-[#7C9074]/40 text-sm text-[#7C9074]/60">
+                        No image yet
+                    </div>
+                )}
+                <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    className="hidden"
+                />
+                <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="mt-2 rounded-md border border-[#7C9074] px-3 py-1 text-sm text-[#7C9074] hover:bg-[#7C9074] hover:text-white disabled:opacity-50"
+                >
+                    {uploading ? "Uploading..." : recipe.image_url ? "Change Photo" : "Upload Photo"}
+                </button>
+            </div>
+
             <div>
                 <h1 className="text-2xl font-bold text-[#7C9074]">{recipe.title}</h1>
                 {recipe.description && <p className="text-[#7C9074]/70">{recipe.description}</p>}

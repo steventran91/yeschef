@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getRecipes, getRecipe, uploadRecipeImage } from "@/lib/api";
+import { getRecipes } from "@/lib/api";
 
 type Recipe = {
     id: number;
@@ -18,8 +17,6 @@ export default function RecipesPage() {
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [uploading, setUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         getRecipes()
@@ -27,7 +24,6 @@ export default function RecipesPage() {
           .catch((err) => setError(err instanceof Error ? err.message : "Failed to load recipes"))
           .finally(() => setLoading(false));
     }, []);
-
 
     const filteredRecipes = recipes.filter((recipe) => 
         recipe.title.toLowerCase().includes(search.toLowerCase())
