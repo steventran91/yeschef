@@ -1,5 +1,27 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export type RecipeCreateInput = {
+    title: string;
+    description?: string;
+    servings?: number;
+    prep_time_minutes?: number;
+    cook_time_minutes?: number;
+    cuisine?: string[];
+    tags?: string[];
+    ingredients: {
+        name: string; 
+        original_text: string;
+        quantity?: number;
+        unit?: string;
+        preparation?: string;
+        section?: string;
+        is_optional?: boolean;
+    }[];
+    instructions: {
+        text: string;
+    }[];
+}
+
 export function getToken(): string | null {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("token");
@@ -74,5 +96,12 @@ export function uploadRecipeImage(id: string | number, file: File) {
             throw new Error(errorBody?.detail || `Request failed with status ${res.status}`);
         }
         return res.json();
+    })
+}
+
+export function createRecipe(data: RecipeCreateInput) {
+    return apiFetch("/recipes", {
+        method: "POST", 
+        body: JSON.stringify(data)
     })
 }
