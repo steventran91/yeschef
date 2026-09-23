@@ -42,6 +42,7 @@ function RecipeCreateForm() {
                 {tags.map((t) => (
                     <span key={t}>{t}</span>
                 ))}
+                <button type="button" onClick={() => {setIngredients([...ingredients, {name: "", original_text: "",  quantity: undefined, unit: "", preparation: "", section: "", is_optional: false }])}}>Add Ingredient</button>
                 <button type="submit">Create</button>
             </form>
         </div>
