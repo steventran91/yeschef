@@ -1,9 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createRecipe } from "@/lib/api";
 
 function RecipeCreateForm() {
+    const router = useRouter();
+
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [servings, setServings] = useState("");
@@ -16,7 +19,7 @@ function RecipeCreateForm() {
     const [ingredients, setIngredients] = useState<{
         name: string;
         original_text: string;
-        quantity?: number;
+        quantity?: string;
         unit?: string;
         preparation?: string;
         section?: string;
@@ -25,6 +28,7 @@ function RecipeCreateForm() {
     const [instructions, setInstructions] = useState<{
         text: string;
     }[]>([]);
+    const [error, setError] = useState<string | null>(null);
 
     function updateIngredient(index: number, field: string, value: string | number | boolean) {
         const updated = [...ingredients];
@@ -38,9 +42,40 @@ function RecipeCreateForm() {
         setInstructions(updated);
     }
 
+    async function handleSubmit(e: React.SubmitEvent) {
+        e.preventDefault()
+        const servingsValue = servings === "" ? undefined : Number(servings);
+        const prepTimeValue = prepTime === "" ? undefined : Number(prepTime);
+        const cookTimeValue = cookTime === "" ? undefined : Number(cookTime);
+        const ingredientQuantityValue = ingredients.map((ing) => ({
+            ...ing, quantity: ing.quantity === undefined || ing.quantity === "" ? undefined : Number(ing.quantity),
+        }))
+
+        const payload = {
+            title, 
+            description,
+            servings: servingsValue,
+            prep_time_minutes: prepTimeValue,
+            cook_time_minutes: cookTimeValue,
+            cuisine,
+            tags,
+            ingredients: ingredientQuantityValue,
+            instructions,
+        };
+        
+        try {
+            const created = await createRecipe(payload);
+            router.push(`/dashboard/recipes/${created.id}`);
+        } catch (err) {
+            setError(err instanceof Error ? err.message: "Failed to create recipe");
+        }
+
+    }
+
     return (
         <div>
-            <form>
+            <form onSubmit={handleSubmit}>
+                {error && <p>{error}</p>}
                 <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}/>
                 <input type="text" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)}/>
                 <input type="number" placeholder="Servings" value={servings} onChange={(e) => setServings(e.target.value)}/>
@@ -56,7 +91,7 @@ function RecipeCreateForm() {
                 {tags.map((t) => (
                     <span key={t}>{t}</span>
                 ))}
-                <button type="button" onClick={() => {setIngredients([...ingredients, {name: "", original_text: "",  quantity: undefined, unit: "", preparation: "", section: "", is_optional: false }])}}>Add Ingredient</button>
+                <button type="button" onClick={() => {setIngredients([...ingredients, {name: "", original_text: "",  quantity: "", unit: "", preparation: "", section: "", is_optional: false }])}}>Add Ingredient</button>
                 {ingredients.map((ingredient, index) => (
                     <div key={index}>
                         <input 
