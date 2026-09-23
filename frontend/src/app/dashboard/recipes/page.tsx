@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { getRecipes } from "@/lib/api";
+import { getRecipes, getRecipe, uploadRecipeImage } from "@/lib/api";
 
 type Recipe = {
     id: number;
     title: string;
     cuisine: string[];
     tags: string[];
+    image_url: string | null;
 };
 
 export default function RecipesPage() {
@@ -16,6 +18,8 @@ export default function RecipesPage() {
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         getRecipes()
@@ -23,6 +27,7 @@ export default function RecipesPage() {
           .catch((err) => setError(err instanceof Error ? err.message : "Failed to load recipes"))
           .finally(() => setLoading(false));
     }, []);
+
 
     const filteredRecipes = recipes.filter((recipe) => 
         recipe.title.toLowerCase().includes(search.toLowerCase())
@@ -50,12 +55,21 @@ export default function RecipesPage() {
                         href={`/dashboard/recipes/${recipe.id}`}
                         className="block rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
                     >
+                        {recipe.image_url && (
+                            <img
+                                src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
+                                alt={recipe.title}
+                                className="h-16 w-16 rounded-md object-cover"
+                            />
+                        )}
+                    <div>
                         <p className="font-medium text-[#7C9074]">{recipe.title}</p>
                         {(recipe.cuisine.length > 0 || recipe.tags.length > 0) && (
                             <p className="text-sm text-[#7C9074]">
                                 {[...recipe.cuisine, ...recipe.tags].join(" · ")}
                             </p>
                         )}
+                    </div>
                     </Link>
                 </li>
             ))}

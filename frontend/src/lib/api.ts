@@ -58,3 +58,21 @@ export function getRecipe(id: string | number) {
 export function getMe() {
     return apiFetch("/auth/me");
 }
+
+export function uploadRecipeImage(id: string | number, file: File) {
+    const token = getToken();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return fetch(`${API_URL}/recipes/${id}/image`, {
+        method: "POST",
+        headers: token ? {Authorization: `Bearer ${token}`} : {},
+        body: formData,
+    }).then(async (res) => {
+        if (!res.ok) {
+            const errorBody = await res.json().catch(() => null);
+            throw new Error(errorBody?.detail || `Request failed with status ${res.status}`);
+        }
+        return res.json();
+    })
+}

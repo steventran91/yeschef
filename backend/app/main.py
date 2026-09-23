@@ -20,7 +20,7 @@ app.add_middleware(
 app.include_router(recipes_router)
 app.include_router(auth_router)
 app.include_router(ai_router)
-app.mount("/uploads", StaticFiles(directory="uploads", name="uploads"))
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/health")
 def health():
