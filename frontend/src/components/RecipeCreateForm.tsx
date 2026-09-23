@@ -22,6 +22,9 @@ function RecipeCreateForm() {
         section?: string;
         is_optional?: boolean;
     }[]>([]);
+    const [instructions, setInstructions] = useState<{
+        text: string;
+    }[]>([]);
 
     function updateIngredient(index: number, field: string, value: string | number | boolean) {
         const updated = [...ingredients];
@@ -29,6 +32,11 @@ function RecipeCreateForm() {
         setIngredients(updated);
     }
 
+    function updateInstructions(index: number, value: string) {
+        const updated = [...instructions];
+        updated[index] = {text: value};
+        setInstructions(updated);
+    }
 
     return (
         <div>
