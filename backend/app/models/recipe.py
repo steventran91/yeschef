@@ -19,6 +19,7 @@ class Recipe(Base):
     notes: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     source_type: Mapped[str] = mapped_column(String, default="manual")
     source_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    image_url: Mapped[str | None] = mapped_column(String, nullable=True)
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )   
