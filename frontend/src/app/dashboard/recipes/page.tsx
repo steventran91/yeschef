@@ -49,23 +49,45 @@ export default function RecipesPage() {
                 <li key={recipe.id}>
                     <Link
                         href={`/dashboard/recipes/${recipe.id}`}
-                        className="block rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
+                        className="flex items-center gap-4 rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
                     >
-                        {recipe.image_url && (
+                        {recipe.image_url ? (
                             <img
                                 src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
                                 alt={recipe.title}
-                                className="h-16 w-16 rounded-md object-cover"
+                                className="h-20 w-20 flex-shrink-0 rounded-md object-cover m-4"
                             />
+                        ) : (
+                            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-md border border-dashed border-[#7C9074]/40 text-xs text-[#7C9074]/50">
+                                No image
+                            </div>
                         )}
-                    <div>
-                        <p className="font-medium text-[#7C9074]">{recipe.title}</p>
-                        {(recipe.cuisine.length > 0 || recipe.tags.length > 0) && (
-                            <p className="text-sm text-[#7C9074]">
-                                {[...recipe.cuisine, ...recipe.tags].join(" · ")}
-                            </p>
-                        )}
-                    </div>
+
+                        <div className="min-w-0 flex-1">
+                            <p className="text-lg font-semibold text-[#7C9074]">{recipe.title}</p>
+
+                            {recipe.cuisine.length > 0 && (
+                                <div className="mt-2 flex flex-wrap items-center gap-1">
+                                    <span className="text-xs font-medium text-[#7C9074]/70">Cuisine:</span>
+                                    {recipe.cuisine.map((c) => (
+                                        <span key={c} className="rounded border border-[#7C9074]/40 px-1 py-0.5 text-xs text-[#7C9074]">
+                                            {c}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+
+                            {recipe.tags.length > 0 && (
+                                <div className="mt-1 flex flex-wrap items-center gap-1">
+                                    <span className="text-xs font-medium text-[#7C9074]/70">Tags:</span>
+                                    {recipe.tags.map((t) => (
+                                        <span key={t} className="rounded border border-[#7C9074]/40 px-1 py-0.5 text-xs text-[#7C9074]">
+                                            {t}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </Link>
                 </li>
             ))}
