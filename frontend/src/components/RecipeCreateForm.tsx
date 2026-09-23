@@ -32,7 +32,7 @@ function RecipeCreateForm() {
         setIngredients(updated);
     }
 
-    function updateInstructions(index: number, value: string) {
+    function updateInstruction(index: number, value: string) {
         const updated = [...instructions];
         updated[index] = {text: value};
         setInstructions(updated);
@@ -104,6 +104,16 @@ function RecipeCreateForm() {
                             Optional
                         </label>
                     </div>
+                ))}
+                <button type="button" onClick={() => setInstructions([...instructions, {text: ""}])}>Add Instructions</button>
+                {instructions.map((instruction, index) => (
+                    <input 
+                        key={index}
+                        type="text"
+                        placeholder={`Step ${index + 1}`}
+                        value={instruction.text}
+                        onChange={(e) => updateInstruction(index, e.target.value)}
+                    />
                 ))}
                 <button type="submit">Create</button>
             </form>
