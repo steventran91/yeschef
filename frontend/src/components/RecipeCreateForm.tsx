@@ -73,7 +73,7 @@ function RecipeCreateForm() {
     }
 
     return (
-        <div>
+        <div className="text-[#7C9074]">
             <form onSubmit={handleSubmit}>
                 {error && <p>{error}</p>}
                 <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}/>
@@ -82,12 +82,18 @@ function RecipeCreateForm() {
                 <input type="number" placeholder="Prep Time" value={prepTime} onChange={(e) => setPrepTime(e.target.value)}/>
                 <input type="number" placeholder="Cook Time" value={cookTime} onChange={(e) => setCookTime(e.target.value)}/>
                 <input type="text" placeholder="Cuisine" value={cuisineInput} onChange={(e) => setCuisineInput(e.target.value)}/>
-                <button type="button" onClick={() => {setCuisine([...cuisine, cuisineInput]); setCuisineInput("");}}>Add</button>
+                <button type="button" onClick={() => { if (cuisineInput.trim() === "") return;
+                    setCuisine([...cuisine, cuisineInput]);
+                    setCuisineInput("");
+                }}>Add</button>
                 {cuisine.map((c) => (
                     <span key={c}>{c}</span>
                 ))}
                 <input type="text" placeholder="Tags" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)}/>
-                <button type="button" onClick={() => {setTags([...tags, tagsInput]); setTagsInput("");}}>Add</button>
+                <button type="button" onClick={() => { if (tagsInput.trim() === "") return;
+                    setTags([...tags, tagsInput]);
+                    setTagsInput("");
+                }}>Add</button>
                 {tags.map((t) => (
                     <span key={t}>{t}</span>
                 ))}
