@@ -13,6 +13,16 @@ function RecipeCreateForm() {
     const [cuisineInput, setCuisineInput] = useState("");
     const [tags, setTags] = useState<string[]>([]);
     const [tagsInput, setTagsInput] = useState("");
+    const [ingredients, setIngredients] = useState<{
+        name: string;
+        original_text: string;
+        quantity?: number;
+        unit?: string;
+        preparation?: string;
+        section?: string;
+        is_optional?: boolean;
+    }[]>([]);
+
 
     return (
         <div>
