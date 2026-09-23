@@ -75,6 +75,7 @@ class RecipeRead(BaseModel):
     notes: list[str]
     source_type: str 
     source_url: str | None 
+    image_url: str | None
     is_archived: bool 
     created_at: datetime 
     updated_at: datetime
