@@ -14,7 +14,7 @@ function NewRecipePage() {
         servings?: number;
         prep_time_minutes?: number;
         cook_time_minutes?: number;
-        cuisin?: string[];
+        cuisine?: string[];
         tags?: string[];
         ingredients?: {
             name: string;
@@ -60,6 +60,18 @@ function NewRecipePage() {
                         {extracting ? "Extracting..." : "Extract Recipe"}
                     </button>
                     {extractError && <p>{extractError}</p>}
+                    {extractedData && (
+                        <div>
+                            {extractedData.warnings && extractedData.warnings.length > 0 && (
+                                <ul>
+                                    {extractedData.warnings.map((warning) => (
+                                        <li key={warning}>{warning}</li>
+                                    ))}
+                                </ul>
+                            )}
+                            <RecipeCreateForm initialData={extractedData}/>
+                        </div>
+                    )}
                 </div>
             )}
             {mode === "manual" && <RecipeCreateForm/>}
