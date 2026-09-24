@@ -4,17 +4,31 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createRecipe } from "@/lib/api";
 
-function RecipeCreateForm() {
+type RecipeCreateFormProps = {
+    initialData?: {
+        title?: string;
+        description?: string;
+        servings?: number;
+        prep_time_minutes?: number;
+        cook_time_minutes?: number;
+        cuisine?: string[];
+        tags?: string[];
+        ingredients?: {name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string; is_optional?: boolean}[];
+        instructions?: {text: string}[];
+    }
+}
+
+function RecipeCreateForm({initialData} : RecipeCreateFormProps) {
     const router = useRouter();
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [servings, setServings] = useState("");
-    const [prepTime, setPrepTime] = useState("");
-    const [cookTime, setCookTime] = useState("");
-    const [cuisine, setCuisine] = useState<string[]>([]);
+    const [title, setTitle] = useState(initialData?.title ?? "");
+    const [description, setDescription] = useState(initialData?.description ?? "");
+    const [servings, setServings] = useState(initialData?.servings === undefined ? "" : String(initialData.servings));
+    const [prepTime, setPrepTime] = useState(initialData?.prep_time_minutes === undefined ? "" : String(initialData.prep_time_minutes));
+    const [cookTime, setCookTime] = useState(initialData?.cook_time_minutes === undefined ? "" : String(initialData.cook_time_minutes));
+    const [cuisine, setCuisine] = useState<string[]>(initialData?.cuisine ?? []);
     const [cuisineInput, setCuisineInput] = useState("");
-    const [tags, setTags] = useState<string[]>([]);
+    const [tags, setTags] = useState<string[]>(initialData?.tags ?? []);
     const [tagsInput, setTagsInput] = useState("");
     const [ingredients, setIngredients] = useState<{
         name: string;
@@ -24,10 +38,15 @@ function RecipeCreateForm() {
         preparation?: string;
         section?: string;
         is_optional?: boolean;
-    }[]>([]);
+    }[]>(initialData?.ingredients?.map((ing) => ({
+        ...ing,
+        quantity: ing.quantity === undefined ? "" : String(ing.quantity),
+    }))?? []);
+
     const [instructions, setInstructions] = useState<{
         text: string;
-    }[]>([]);
+    }[]>(initialData?.instructions ?? []);
+    
     const [error, setError] = useState<string | null>(null);
 
     function updateIngredient(index: number, field: string, value: string | number | boolean) {
