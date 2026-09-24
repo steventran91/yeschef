@@ -72,16 +72,43 @@ export default function RecipeDetailPage() {
     if (!recipe) return null;
 
     return (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:divide-x md:divide-[#7C9074]/20">
             <div>
+                <h2 className="text-center text-2xl font-bold text-[#7C9074]">Ingredients</h2>
+                <p className="mt-1 text-center text-sm text-[#7C9074]">
+                    Servings: {recipe.servings ?? 0} · Prep time: {recipe.prep_time_minutes ?? 0} · Cook time: {recipe.cook_time_minutes ?? 0}
+                </p>
+                <ul className="mt-3 space-y-1">
+                    {recipe.ingredients.map((ing) => (
+                        <li key={ing.id} className="text-sm text-[#4B5A44]">
+                            {ing.original_text}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div>
+                <h2 className="text-center text-2xl font-bold text-[#7C9074]">Instructions</h2>
+                <ol className="mt-3 space-y-2">
+                    {recipe.instructions.map((instr) => (
+                        <li key={instr.id} className="text-sm text-[#4B5A44]">
+                            <span className="font-medium">{instr.step_number}.</span> {instr.text}
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            <div className="text-center">
+                <h1 className="text-2xl font-bold text-[#7C9074]">{recipe.title}</h1>
+
                 {recipe.image_url ? (
                     <img
                         src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
                         alt={recipe.title}
-                        className="h-48 w-full rounded-lg object-cover"
+                        className="mx-auto mt-3 aspect-square w-4/5 rounded-lg object-cover"
                     />
                 ) : (
-                    <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed border-[#7C9074]/40 text-sm text-[#7C9074]/60">
+                    <div className="mx-auto mt-3 flex aspect-square w-4/5 items-center justify-center rounded-lg border border-dashed border-[#7C9074]/40 text-sm text-[#7C9074]/60">
                         No image yet
                     </div>
                 )}
@@ -100,36 +127,10 @@ export default function RecipeDetailPage() {
                 >
                     {uploading ? "Uploading..." : recipe.image_url ? "Change Photo" : "Upload Photo"}
                 </button>
-            </div>
 
-            <div>
-                <h1 className="text-2xl font-bold text-[#7C9074]">{recipe.title}</h1>
-                {recipe.description && <p className="text-[#7C9074]/70">{recipe.description}</p>}
-                <p className="text-sm text-[#7C9074]">
-                    Servings: {recipe.servings ?? 0} · Prep time: {recipe.prep_time_minutes ?? 0} · Cook time: {recipe.cook_time_minutes ?? 0}
-                </p>
-            </div>
-
-            <div>
-                <h2 className="font-medium text-[#7C9074]">Ingredients</h2>
-                <ul className="mt-2 space-y-1">
-                    {recipe.ingredients.map((ing) => (
-                        <li key={ing.id} className="text-sm text-[#4B5A44]">
-                            {ing.original_text}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            <div>
-                <h2 className="font-medium text-[#7C9074]">Instructions</h2>
-                <ol className="mt-2 space-y-2">
-                    {recipe.instructions.map((instr) => (
-                        <li key={instr.id} className="text-sm text-[#4B5A44]">
-                            <span className="font-medium">{instr.step_number}.</span> {instr.text}
-                        </li>
-                    ))}
-                </ol>
+                {recipe.description && (
+                    <p className="mt-6 text-sm text-[#7C9074]/70">{recipe.description}</p>
+                )}
             </div>
         </div>
     )
