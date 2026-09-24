@@ -99,6 +99,24 @@ export function uploadRecipeImage(id: string | number, file: File) {
     })
 }
 
+export function extractRecipeFromImage(files: File[]) {
+    const token = getToken();
+    const formData = new FormData();
+    files.forEach((file) => formData.append("files", file));
+
+    return fetch(`${API_URL}/ai/extract-recipe-image`, {
+        method: "POST",
+        headers: token ? {Authorization: `Bearer ${token}`} : {},
+        body: formData,
+    }).then(async (res) => {
+        if (!res.ok) {
+            const errorBody = await res.json().catch(() => null);
+            throw new Error(errorBody?.detail || `Request failed with status ${res.status}`);
+        }
+        return res.json();
+    });
+}
+
 export function createRecipe(data: RecipeCreateInput) {
     return apiFetch("/recipes", {
         method: "POST", 
