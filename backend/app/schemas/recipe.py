@@ -25,6 +25,7 @@ class RecipeIngredientRead(BaseModel):
 
 class RecipeInstructionCreate(BaseModel):
     text: str 
+    section: str | None = None
 
 class RecipeInstructionRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -32,6 +33,7 @@ class RecipeInstructionRead(BaseModel):
     id: int 
     step_number: int 
     text: str 
+    section: str | None = None 
 
 class RecipeCreate(BaseModel):
     title: str 
