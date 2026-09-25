@@ -11,6 +11,7 @@ class ExtractedIngredient(BaseModel):
 
 class ExtractedInstruction(BaseModel):
     text: str 
+    section: str | None = None 
 
 class ExtractedRecipe(BaseModel):
     title: str 
