@@ -43,7 +43,14 @@ export default function RecipeDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
+    const [checkedIds, setCheckedIds] = useState<number[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    function toggleIngredient(id: number) {
+        setCheckedIds((prev) =>
+            prev.includes(id) ? prev.filter((existingId) => existingId !== id) : [...prev, id]
+        );
+    }
 
     useEffect(() => {
         getRecipe(id)
@@ -79,15 +86,33 @@ export default function RecipeDetailPage() {
                     Servings: {recipe.servings ?? 0} · Prep time: {recipe.prep_time_minutes ?? 0} · Cook time: {recipe.cook_time_minutes ?? 0}
                 </p>
                 <ul className="mt-3 space-y-1">
-                    {recipe.ingredients.map((ing) => (
-                        <li key={ing.id} className="text-sm text-[#4B5A44]">
-                            {ing.original_text}
-                        </li>
-                    ))}
+                    {recipe.ingredients.map((ing, index) => {
+                        const previousSection = index > 0 ? recipe.ingredients[index - 1].section : null;
+                        const showSectionHeader = ing.section && ing.section !== previousSection;
+
+                        return (
+                            <li key={ing.id}>
+                                {showSectionHeader && (
+                                    <p className="mt-3 mb-1 font-semibold text-[#7C9074]">{ing.section}</p>
+                                )}
+                                <label className="flex items-center gap-2 text-sm text-[#4B5A44]">
+                                    <input
+                                        type="checkbox"
+                                        checked={checkedIds.includes(ing.id)}
+                                        onChange={() => toggleIngredient(ing.id)}
+                                        className="h-4 w-4 appearance-none rounded-full border border-[#7C9074] checked:bg-[#7C9074]"
+                                    />
+                                    <span className={checkedIds.includes(ing.id) ? "text-[#7C9074]/40 line-through" : ""}>
+                                        {ing.original_text}
+                                    </span>
+                                </label>
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
 
-            <div>
+            <div className="pr-6">
                 <h2 className="text-center text-2xl font-bold text-[#7C9074]">Instructions</h2>
                 <ol className="mt-3 space-y-2">
                     {recipe.instructions.map((instr) => (
