@@ -14,8 +14,7 @@ type RecipeCreateFormProps = {
         cuisine?: string[];
         tags?: string[];
         ingredients?: {name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string; is_optional?: boolean}[];
-        instructions?: {text: string}[];
-        section?: string;
+        instructions?: {text: string; section?: string;}[];
     }
 }
 
@@ -57,9 +56,9 @@ function RecipeCreateForm({initialData} : RecipeCreateFormProps) {
         setIngredients(updated);
     }
 
-    function updateInstruction(index: number, value: string) {
+    function updateInstruction(index: number, field: string, value: string) {
         const updated = [...instructions];
-        updated[index] = {text: value};
+        updated[index] = {...updated[index], [field]: value};
         setInstructions(updated);
     }
 
@@ -167,15 +166,22 @@ function RecipeCreateForm({initialData} : RecipeCreateFormProps) {
                         </label>
                     </div>
                 ))}
-                <button type="button" onClick={() => setInstructions([...instructions, {text: ""}])}>Add Instructions</button>
+                <button type="button" onClick={() => setInstructions([...instructions, {text: "", section: ""}])}>Add Instructions</button>
                 {instructions.map((instruction, index) => (
-                    <input 
-                        key={index}
-                        type="text"
-                        placeholder={`Step ${index + 1}`}
-                        value={instruction.text}
-                        onChange={(e) => updateInstruction(index, e.target.value)}
-                    />
+                    <div key={index}>
+                        <input 
+                            type="text"
+                            placeholder={`Step ${index + 1}`}
+                            value={instruction.text}
+                            onChange={(e) => updateInstruction(index, "text", e.target.value)}
+                        />
+                        <input 
+                            type="text"
+                            placeholder="Section (optional)"
+                            value={instruction.section ?? ""}
+                            onChange={(e) => updateInstruction(index, "section", e.target.value)}
+                        />
+                    </div>
                 ))}
                 <button type="submit">Create</button>
             </form>
