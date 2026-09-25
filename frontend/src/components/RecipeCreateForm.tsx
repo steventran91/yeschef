@@ -15,6 +15,7 @@ type RecipeCreateFormProps = {
         tags?: string[];
         ingredients?: {name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string; is_optional?: boolean}[];
         instructions?: {text: string}[];
+        section?: string;
     }
 }
 
@@ -45,8 +46,9 @@ function RecipeCreateForm({initialData} : RecipeCreateFormProps) {
 
     const [instructions, setInstructions] = useState<{
         text: string;
+        section?: string;
     }[]>(initialData?.instructions ?? []);
-    
+
     const [error, setError] = useState<string | null>(null);
 
     function updateIngredient(index: number, field: string, value: string | number | boolean) {
