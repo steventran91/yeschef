@@ -57,3 +57,4 @@ class RecipeInstruction(Base):
     step_number: Mapped[int] = mapped_column(Integer, nullable=False)
     text: Mapped[str] = mapped_column(Text, nullable=False)
     recipe: Mapped["Recipe"] = relationship(back_populates="instructions")
+    section: Mapped[str | None] = mapped_column(String, nullable=True)
