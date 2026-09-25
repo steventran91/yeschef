@@ -33,7 +33,7 @@ class RecipeInstructionRead(BaseModel):
     id: int 
     step_number: int 
     text: str 
-    section: str | None = None 
+    section: str | None 
 
 class RecipeCreate(BaseModel):
     title: str 

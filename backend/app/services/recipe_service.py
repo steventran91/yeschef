@@ -36,7 +36,8 @@ def create_recipe(db: Session, data: RecipeCreate, user_id: int) -> Recipe:
         recipe.instructions.append(
             RecipeInstruction(
                 text=instruction.text,
-                step_number=i + 1
+                step_number=i + 1,
+                section=instruction.section,
             )
         )
 
@@ -88,6 +89,7 @@ def update_recipe(db: Session, recipe_id: int, user_id: int, data: RecipeUpdate)
                 RecipeInstruction(
                     text=instruction.text,
                     step_number=i + 1,
+                    section=instruction.section,
                 )
             )
 
