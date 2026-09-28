@@ -19,6 +19,7 @@ type Instruction = {
     id: number;
     step_number: number;
     text: string;
+    section: string | null;
 }
 
 type Recipe = {
@@ -44,10 +45,17 @@ export default function RecipeDetailPage() {
     const [error, setError] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [checkedIds, setCheckedIds] = useState<number[]>([]);
+    const [checkedInstructionIds, setCheckedInstructionIds] = useState<number[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     function toggleIngredient(id: number) {
         setCheckedIds((prev) =>
+            prev.includes(id) ? prev.filter((existingId) => existingId !== id) : [...prev, id]
+        );
+    }
+
+    function toggleInstruction(id: number) {
+        setCheckedInstructionIds((prev) =>
             prev.includes(id) ? prev.filter((existingId) => existingId !== id) : [...prev, id]
         );
     }
@@ -100,7 +108,7 @@ export default function RecipeDetailPage() {
                                         type="checkbox"
                                         checked={checkedIds.includes(ing.id)}
                                         onChange={() => toggleIngredient(ing.id)}
-                                        className="h-4 w-4 appearance-none rounded-full border border-[#7C9074] checked:bg-[#7C9074]"
+                                        className="h-4 w-4 flex-shrink-0 appearance-none rounded-full border border-[#7C9074] checked:bg-[#7C9074]"
                                     />
                                     <span className={checkedIds.includes(ing.id) ? "text-[#7C9074]/40 line-through" : ""}>
                                         {ing.original_text}
@@ -115,11 +123,29 @@ export default function RecipeDetailPage() {
             <div className="pr-6">
                 <h2 className="text-center text-2xl font-bold text-[#7C9074]">Instructions</h2>
                 <ol className="mt-3 space-y-2">
-                    {recipe.instructions.map((instr) => (
-                        <li key={instr.id} className="text-sm text-[#4B5A44]">
-                            <span className="font-medium">{instr.step_number}.</span> {instr.text}
-                        </li>
-                    ))}
+                    {recipe.instructions.map((instr, index) => {
+                        const previousSection = index > 0 ? recipe.instructions[index - 1].section : null;
+                        const showSectionHeader = instr.section && instr.section !== previousSection;
+
+                        return (
+                            <li key={instr.id}>
+                                {showSectionHeader && (
+                                    <p className="mt-3 mb-1 font-semibold text-[#7C9074]">{instr.section}</p>
+                                )}
+                                <label className="flex items-center gap-2 text-sm text-[#4B5A44]">
+                                    <input 
+                                        type="checkbox"
+                                        checked={checkedInstructionIds.includes(instr.id)}
+                                        onChange={() => toggleInstruction(instr.id)}
+                                        className="h-4 w-4 flex-shrink-0 appearance-none rounded-full border border-[#7C9074] checked:bg-[#7C9074]"
+                                    />
+                                    <span className={checkedInstructionIds.includes(instr.id) ? "text-[#7C9074]/40 line-through" : ""}>
+                                        {instr.text}
+                                    </span>
+                                </label>
+                            </li>
+                        )
+                    })}
                 </ol>
             </div>
 

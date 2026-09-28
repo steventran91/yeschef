@@ -44,36 +44,60 @@ function NewRecipePage() {
         }
     }
 
+    const tabButtonClass = (isActive: boolean) =>
+        `rounded-md border px-4 py-2 text-sm font-medium ${
+            isActive
+                ? "border-[#7C9074] bg-[#7C9074] text-white"
+                : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
+        }`;
+
     return (
-        <div>
-            <button type="button" onClick={() => setMode("manual")}>Create Manually</button>
-            <button type="button" onClick={() => setMode("import")}>Import from Photo</button>
+        <div className="space-y-6 text-[#7C9074]">
+            <div className="flex gap-3">
+                <button type="button" className={tabButtonClass(mode === "manual")} onClick={() => setMode("manual")}>Create Manually</button>
+                <button type="button" className={tabButtonClass(mode === "import")} onClick={() => setMode("import")}>Import from Photo</button>
+            </div>
+
             {mode === "import" && (
-                <div>
-                    <input 
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        multiple
-                        onChange={(e) => setFiles(e.target.files ? Array.from(e.target.files) : [])}
-                    />    
-                    <button type="button" onClick={handleExtract} disabled={extracting}>
-                        {extracting ? "Extracting..." : "Extract Recipe"}
-                    </button>
-                    {extractError && <p>{extractError}</p>}
+                <div className="space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            multiple
+                            onChange={(e) => setFiles(e.target.files ? Array.from(e.target.files) : [])}
+                            className="text-sm text-[#7C9074] file:mr-3 file:rounded-md file:border file:border-[#7C9074] file:bg-white file:px-3 file:py-1 file:text-sm file:text-[#7C9074] file:hover:bg-[#7C9074] file:hover:text-white"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleExtract}
+                            disabled={extracting}
+                            className="rounded-md border border-[#7C9074] px-4 py-2 text-sm font-medium text-[#7C9074] hover:bg-[#7C9074] hover:text-white disabled:opacity-50"
+                        >
+                            {extracting ? "Extracting..." : "Extract Recipe"}
+                        </button>
+                    </div>
+
+                    {extractError && <p className="text-sm text-red-600">{extractError}</p>}
+
                     {extractedData && (
-                        <div>
+                        <div className="space-y-4">
                             {extractedData.warnings && extractedData.warnings.length > 0 && (
-                                <ul>
-                                    {extractedData.warnings.map((warning) => (
-                                        <li key={warning}>{warning}</li>
-                                    ))}
-                                </ul>
+                                <div className="rounded-md border border-amber-400/50 bg-amber-50 p-3">
+                                    <p className="text-sm font-semibold text-amber-700">Please review:</p>
+                                    <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-amber-700">
+                                        {extractedData.warnings.map((warning) => (
+                                            <li key={warning}>{warning}</li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
                             <RecipeCreateForm initialData={extractedData}/>
                         </div>
                     )}
                 </div>
             )}
+
             {mode === "manual" && <RecipeCreateForm/>}
         </div>
     )
