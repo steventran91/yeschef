@@ -192,7 +192,13 @@ export default function RecipeDetailPage() {
                 >
                     {uploading ? "Uploading..." : recipe.image_url ? "Change Photo" : "Upload Photo"}
                 </button>
-
+                <button
+                    type="button"
+                    onClick={handleArchive}
+                    className="mt-2 rounded-md border border-red-400 px-3 py-1 text-sm text-red-500 hover:bg-red-500 hover:text-white ml-2"
+                >
+                    Archive Recipe
+                </button>
                 {recipe.description && (
                     <p className="mt-6 text-sm text-[#7C9074]/70">{recipe.description}</p>
                 )}
