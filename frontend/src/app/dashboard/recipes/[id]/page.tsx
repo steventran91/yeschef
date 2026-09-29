@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { getRecipe, uploadRecipeImage, archiveRecipe } from "@/lib/api";
 
 type Ingredient = {
@@ -184,6 +185,21 @@ export default function RecipeDetailPage() {
                     onChange={handleImageChange}
                     className="hidden"
                 />
+                <div className="mt-2 flex justify-center gap-2">
+                    <Link
+                        href={`/dashboard/recipes/new?edit=${recipe.id}`}
+                        className="rounded-md border border-[#7C9074] px-3 py-1 text-sm text-[#7C9074] hover:bg-[#7C9074] hover:text-white"
+                    >
+                        Update Recipe
+                    </Link>
+                    <button
+                        type="button"
+                        onClick={handleArchive}
+                        className="rounded-md border border-red-400 px-3 py-1 text-sm text-red-500 hover:bg-red-500 hover:text-white"
+                    >
+                        Archive Recipe
+                    </button>
+                </div>
                 <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -191,13 +207,6 @@ export default function RecipeDetailPage() {
                     className="mt-2 rounded-md border border-[#7C9074] px-3 py-1 text-sm text-[#7C9074] hover:bg-[#7C9074] hover:text-white disabled:opacity-50"
                 >
                     {uploading ? "Uploading..." : recipe.image_url ? "Change Photo" : "Upload Photo"}
-                </button>
-                <button
-                    type="button"
-                    onClick={handleArchive}
-                    className="mt-2 rounded-md border border-red-400 px-3 py-1 text-sm text-red-500 hover:bg-red-500 hover:text-white ml-2"
-                >
-                    Archive Recipe
                 </button>
                 {recipe.description && (
                     <p className="mt-6 text-sm text-[#7C9074]/70">{recipe.description}</p>

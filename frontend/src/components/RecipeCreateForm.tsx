@@ -95,7 +95,7 @@ function RecipeCreateForm({initialData, recipeId} : RecipeCreateFormProps) {
                 router.push(`/dashboard/recipes/${created.id}`)
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message: "Failed to save recipe");
+            setError(err instanceof Error ? err.message: "Failed to save recipe.");
         }
 
     }
@@ -179,7 +179,7 @@ function RecipeCreateForm({initialData, recipeId} : RecipeCreateFormProps) {
                                     className={inputClass}
                                     type="text"
                                     placeholder="Unit"
-                                    value={ingredient.unit}
+                                    value={ingredient.unit ?? ""}
                                     onChange={(e) => updateIngredient(index, "unit", e.target.value)}
                                 />
                             </div>
@@ -187,14 +187,14 @@ function RecipeCreateForm({initialData, recipeId} : RecipeCreateFormProps) {
                                 className={inputClass}
                                 type="text"
                                 placeholder="Preparation"
-                                value={ingredient.preparation}
+                                value={ingredient.preparation ?? ""}
                                 onChange={(e) => updateIngredient(index, "preparation", e.target.value)}
                             />
                             <input
                                 className={inputClass}
                                 type="text"
                                 placeholder="Section"
-                                value={ingredient.section}
+                                value={ingredient.section ?? ""}
                                 onChange={(e) => updateIngredient(index, "section", e.target.value)}
                             />
                             <label className={`flex items-center gap-2 ${rowLabelClass}`}>

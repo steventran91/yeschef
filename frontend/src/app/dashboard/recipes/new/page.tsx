@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RecipeCreateForm from "@/components/RecipeCreateForm"
-import { extractRecipeFromImage } from "@/lib/api";
+import { extractRecipeFromImage, getRecipe } from "@/lib/api";
+import { useSearchParams } from "next/navigation";
 
 function NewRecipePage() {
+    const searchParams = useSearchParams();
+    const editId = searchParams.get("edit");
     const [mode, setMode] = useState<"manual" | "import">("manual");
     const [files, setFiles] = useState<File[]>([]);
     const [extracting, setExtracting] = useState(false);
@@ -29,6 +32,28 @@ function NewRecipePage() {
         warnings?: string[];
     } | null>(null);
     const [extractError, setExtractError] = useState<string | null>(null);
+    const [editRecipe, setEditRecipe] = useState<{
+            id: number;
+            title?: string;
+            description?: string;
+            servings?: number;
+            prep_time_minutes?: number;
+            cook_time_minutes?: number;
+            cuisine?: string[];
+            tags?: string[];
+            ingredients?: {
+                name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string; is_optional?: boolean
+            }[];
+            instructions?: {text: string; section?: string;}[];
+    } | null>(null);
+    const [loadingEdit, setLoadingEdit] = useState(!!editId);
+
+    useEffect(() => {
+        if (!editId) return;
+        getRecipe(editId)
+          .then((data) => setEditRecipe(data))
+          .finally(() => setLoadingEdit(false));
+    }, [editId]); 
 
     async function handleExtract() {
         if (files.length === 0) return;
@@ -50,6 +75,18 @@ function NewRecipePage() {
                 ? "border-[#7C9074] bg-[#7C9074] text-white"
                 : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
         }`;
+
+    if (editId) {
+        if (loadingEdit) return <p>Loading recipe...</p>
+        if (!editRecipe) return <p>Recipe not found.</p>
+
+        return (
+            <div className="space-y-6 text-[#7C9074]">
+                <h1 className="text-lg font-semibold">Edit Recipe</h1>
+                <RecipeCreateForm initialData={editRecipe} recipeId={editRecipe.id}/>
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-6 text-[#7C9074]">
