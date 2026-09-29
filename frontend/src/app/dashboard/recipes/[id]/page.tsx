@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
-import { getRecipe, uploadRecipeImage } from "@/lib/api";
+import { useParams, useRouter } from "next/navigation";
+import { getRecipe, uploadRecipeImage, archiveRecipe } from "@/lib/api";
 
 type Ingredient = {
     id: number,
@@ -37,6 +37,7 @@ type Recipe = {
 }
 
 export default function RecipeDetailPage() {
+    const router = useRouter()
     const params = useParams();
     const id = params.id as string; 
 
@@ -79,6 +80,19 @@ export default function RecipeDetailPage() {
             setError(err instanceof Error ? err.message : "Failed to upload image");
         } finally {
             setUploading(false);
+        }
+    }
+
+    async function handleArchive() {
+        if (!confirm("Archive this recipe?")) return;
+
+        try {
+            if (recipe) {
+                await archiveRecipe(recipe.id);
+            }
+            router.push("/dashboard/recipes")
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to archive recipe")
         }
     }
 

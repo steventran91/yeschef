@@ -121,5 +121,11 @@ export function createRecipe(data: RecipeCreateInput) {
     return apiFetch("/recipes", {
         method: "POST", 
         body: JSON.stringify(data)
-    })
+    });
+}
+
+export function archiveRecipe(id: string | number) {
+    return apiFetch(`/recipes/${id}`, {
+        method: "DELETE",
+    });
 }
