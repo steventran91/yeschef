@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createRecipe } from "@/lib/api";
+import { createRecipe, updateRecipe } from "@/lib/api";
+
 
 type RecipeCreateFormProps = {
     initialData?: {
@@ -15,10 +16,11 @@ type RecipeCreateFormProps = {
         tags?: string[];
         ingredients?: {name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string; is_optional?: boolean}[];
         instructions?: {text: string; section?: string;}[];
-    }
+    };
+    recipeId?: number;
 }
 
-function RecipeCreateForm({initialData} : RecipeCreateFormProps) {
+function RecipeCreateForm({initialData, recipeId} : RecipeCreateFormProps) {
     const router = useRouter();
 
     const [title, setTitle] = useState(initialData?.title ?? "");
@@ -84,10 +86,16 @@ function RecipeCreateForm({initialData} : RecipeCreateFormProps) {
         };
         
         try {
-            const created = await createRecipe(payload);
-            router.push(`/dashboard/recipes/${created.id}`);
+            
+            if (recipeId) {
+                await updateRecipe(recipeId, payload);
+                router.push(`/dashboard/recipes/${recipeId}`);
+            } else {
+                const created = await createRecipe(payload);
+                router.push(`/dashboard/recipes/${created.id}`)
+            }
         } catch (err) {
-            setError(err instanceof Error ? err.message: "Failed to create recipe");
+            setError(err instanceof Error ? err.message: "Failed to save recipe");
         }
 
     }

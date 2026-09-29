@@ -124,6 +124,13 @@ export function createRecipe(data: RecipeCreateInput) {
     });
 }
 
+export function updateRecipe(id: string | number, data: Partial<RecipeCreateInput>) {
+    return apiFetch(`/recipes/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data)
+    });
+}
+
 export function archiveRecipe(id: string | number) {
     return apiFetch(`/recipes/${id}`, {
         method: "DELETE",
