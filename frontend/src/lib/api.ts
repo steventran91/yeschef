@@ -136,3 +136,10 @@ export function archiveRecipe(id: string | number) {
         method: "DELETE",
     });
 }
+
+export function matchRecipesByIngredients(ingredients: string[]) {
+    return apiFetch("/recipes/match-by-ingredients", {
+        method: "POST",
+        body: JSON.stringify({ingredients})
+    });
+}
