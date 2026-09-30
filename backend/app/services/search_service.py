@@ -19,18 +19,30 @@ def match_recipes_by_ingredients(db: Session, user_id: int, have_ingredients: li
         if total_count == 0:
             continue
 
-        matched_ingredients = []
+        match_ingredients = []
         missing_ingredients = []
         for ingredient in required_ingredients:
             ing = ingredient.name.strip().lower()
-            if any(ing in ingredient for ingredient in search_ingredients) == True:
-                matched_ingredients.append(ing)
+            if any(ing in have or have in ing for have in search_ingredients):
+                match_ingredients.append(ingredient.name)
             else:
-                missing_ingredients.append(ing)
+                missing_ingredients.append(ingredient.name)
 
-        ing_total_count = len(matched_ingredients)
-        if ing_total_count == 0:
+        match_count = len(match_ingredients)
+        if match_count == 0:
             continue 
+
+        results.append(
+            IngredientMatchResult(
+                recipe=RecipeRead.model_validate(recipe),
+                match_count=match_count,
+                total_count=total_count,
+                match_percentage=match_count / total_count * 100,
+                missing_ingredients=missing_ingredients,
+            )
+        )
+
+    return sorted(results, key=lambda x:x.match_percentage, reverse=True)
 
 
 
