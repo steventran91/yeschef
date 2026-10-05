@@ -51,7 +51,7 @@ export default function RecipesPage() {
                         mode === "all" ? "border-[#7C9074] bg-[#7C9074] text-white" : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
                     }`}>All Recipes</button>
                     <button type="button" onClick={() => setMode("search")} className={`rounded-md border px-4 py-2 text-sm font-medium ${
-                        mode === "all" ? "border-[#7C9074] bg-[#7C9074] text-white" : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
+                        mode === "search" ? "border-[#7C9074] bg-[#7C9074] text-white" : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
                     }`}>Search By Ingredients</button>
                 </div>
             </div>
