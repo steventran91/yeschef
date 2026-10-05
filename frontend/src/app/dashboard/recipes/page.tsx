@@ -20,7 +20,16 @@ export default function RecipesPage() {
     const [mode, setMode] = useState<"all" | "search">("all");
     const [haveIngredients, setHaveIngredients] = useState<string[]>([]);
     const [haveInput, setHaveInput] = useState("");
-
+    const [matchResults, setMatchResults] = useState<{
+        recipe: Recipe;
+        match_count: number;
+        total_count: number;
+        match_percentage: number;
+        missing_ingredients: string[];
+    }[]>([]);
+    const [searching, setSearching] = useState(false);
+    const [searchError, setSearchError] = useState<string | null>(null);
+    
     useEffect(() => {
         getRecipes()
           .then((data) => setRecipes(data))
