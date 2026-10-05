@@ -17,6 +17,9 @@ export default function RecipesPage() {
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [mode, setMode] = useState<"all" | "search">("all");
+    const [haveIngredients, setHaveIngredients] = useState<string[]>([]);
+    const [haveInput, setHaveInput] = useState("");
 
     useEffect(() => {
         getRecipes()
@@ -42,6 +45,16 @@ export default function RecipesPage() {
                 className="w-full max-w-sm rounded-md border border-[#7C9074]/40 bg-white/60 px-2 text-sm text-[#4B5A44] placeholder:text-[#7C9074]/60 focus:outline-none focus:ring-2 focus:ring-[#7C9074]/50"
                 />
             <Link href="/dashboard/recipes/new" className="text-[#7C9074] font-medium hover:underline ml-2">+ New Recipe</Link>
+            <div className="space-y-6 text-[#7C9074]">
+                <div className="flex gap-3">
+                    <button type="button" onClick={() => setMode("all")} className={`rounded-md border px-4 py-2 text-sm font-medium ${
+                        mode === "all" ? "border-[#7C9074] bg-[#7C9074] text-white" : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
+                    }`}>All Recipes</button>
+                    <button type="button" onClick={() => setMode("search")} className={`rounded-md border px-4 py-2 text-sm font-medium ${
+                        mode === "all" ? "border-[#7C9074] bg-[#7C9074] text-white" : "border-[#7C9074]/40 text-[#7C9074] hover:border-[#7C9074]"
+                    }`}>Search By Ingredients</button>
+                </div>
+            </div>
     {filteredRecipes.length === 0 ? (
         <p className="text-[#7C9074]/70">No recipes found.</p>
     ) : (

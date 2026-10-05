@@ -105,3 +105,4 @@ def archive_recipe(db: Session, recipe_id: int, user_id: int) -> Recipe | None:
     db.commit()
     db.refresh(recipe)
     return recipe 
+
