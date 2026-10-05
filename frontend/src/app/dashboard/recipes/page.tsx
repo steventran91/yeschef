@@ -55,6 +55,37 @@ export default function RecipesPage() {
                     }`}>Search By Ingredients</button>
                 </div>
             </div>
+            {mode === "search" && (
+                <div className="mt-4">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="e.g. garlic"
+                            value={haveInput}
+                            onChange={(e) => setHaveInput(e.target.value)}
+                            className="w-full max-w-sm rounded-md border border-[#7C9074]/40 bg-white/60 px-2 py-1 text-sm text-[#4B5A44] placeholder:text-[#7C9074]/60 focus:outline-none focus:ring-2 focus:ring-[#7C9074]/50"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (haveInput.trim() === "") return;
+                                setHaveIngredients([...haveIngredients, haveInput]);
+                                setHaveInput("")
+                            }}
+                            className="rounded-md border border-[#7C9074] px-3 py-1 text-sm text-[#7C9074] hover:bg-[#7C9074] hover:text-white"
+                        >
+                            Add
+                        </button>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                            {haveIngredients.map((ing) => (
+                                <span   key={ing} className="rounded border border-[#7C9074]/40 px-2 py-0.5 text-xs text-[#7C9074]">
+                                    {ing}
+                                </span>
+                            ))}
+                    </div>
+                </div>
+            )}
     {filteredRecipes.length === 0 ? (
         <p className="text-[#7C9074]/70">No recipes found.</p>
     ) : (
