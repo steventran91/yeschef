@@ -119,60 +119,84 @@ export default function RecipesPage() {
                 </div>
             )}
     {mode === "all" && (
+        filteredRecipes.length === 0 ? (
+            <p className="text-[#7C9074]/70">No recipes found.</p>
+        ) : (
+            <ul className="space-y-2">
+                {filteredRecipes.map((recipe) => (
+                    <li key={recipe.id}>
+                        <Link
+                            href={`/dashboard/recipes/${recipe.id}`}
+                            className="flex min-h-[128px] items-start gap-4 rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
+                        >
+                            {recipe.image_url ? (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
+                                    alt={recipe.title}
+                                    className="h-20 w-20 flex-shrink-0 rounded-md object-cover"
+                                />
+                            ) : (
+                                <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-md border border-dashed border-[#7C9074]/40 text-xs text-[#7C9074]/50">
+                                    No image
+                                </div>
+                            )}
 
-    filteredRecipes.length === 0 ? (
-        <p className="text-[#7C9074]/70">No recipes found.</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-lg font-semibold text-[#7C9074]">{recipe.title}</p>
+
+                                {recipe.cuisine.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap items-center gap-1">
+                                        <span className="text-xs font-medium text-[#7C9074]/70">Cuisine:</span>
+                                        {recipe.cuisine.map((c) => (
+                                            <span key={c} className="rounded border border-[#7C9074]/40 px-1 py-0.5 text-xs text-[#7C9074]">
+                                                {c}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {recipe.tags.length > 0 && (
+                                    <div className="mt-1 flex flex-wrap items-center gap-1">
+                                        <span className="text-xs font-medium text-[#7C9074]/70">Tags:</span>
+                                        {recipe.tags.map((t) => (
+                                            <span key={t} className="rounded border border-[#7C9074]/40 px-1 py-0.5 text-xs text-[#7C9074]">
+                                                {t}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        )
+    )}
+    {mode === "search" && (
+        matchResults.length === 0 ? (
+            <p className="text-[#7C9074]/70">No matches yet - add some ingredients and search.</p>
     ) : (
         <ul className="space-y-2">
-            {filteredRecipes.map((recipe) => (
-                <li key={recipe.id}>
-                    <Link
-                        href={`/dashboard/recipes/${recipe.id}`}
-                        className="flex min-h-[128px] items-start gap-4 rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
+            {matchResults.map((result) => (
+                <li key={result.recipe.id}>
+                    <Link 
+                        href={`/dashboard/recipes/${result.recipe.id}`}
+                        className="block rounded-lg border border-[#7C9074]/20 bg-white/60 p-4 hover:border-[#7C9074]"
                     >
-                        {recipe.image_url ? (
-                            <img
-                                src={`${process.env.NEXT_PUBLIC_API_URL}${recipe.image_url}`}
-                                alt={recipe.title}
-                                className="h-20 w-20 flex-shrink-0 rounded-md object-cover"
-                            />
-                        ) : (
-                            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-md border border-dashed border-[#7C9074]/40 text-xs text-[#7C9074]/50">
-                                No image
-                            </div>
+                        <p className="text-lg font-semibold text-[#7C9074]">{result.recipe.title}</p>
+                        <p className="mt-1 text-sm text-[#7C9074]">
+                            {result.match_count}/{result.total_count} ingredients - {result.match_percentage}% match
+                        </p>
+                        {result.missing_ingredients.length > 0 && (
+                            <p className="mt-1 text-sm text-[#7C9074]/70">
+                                Missing: {result.missing_ingredients.join(", ")}
+                            </p>
                         )}
-
-                        <div className="min-w-0 flex-1">
-                            <p className="text-lg font-semibold text-[#7C9074]">{recipe.title}</p>
-
-                            {recipe.cuisine.length > 0 && (
-                                <div className="mt-2 flex flex-wrap items-center gap-1">
-                                    <span className="text-xs font-medium text-[#7C9074]/70">Cuisine:</span>
-                                    {recipe.cuisine.map((c) => (
-                                        <span key={c} className="rounded border border-[#7C9074]/40 px-1 py-0.5 text-xs text-[#7C9074]">
-                                            {c}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-
-                            {recipe.tags.length > 0 && (
-                                <div className="mt-1 flex flex-wrap items-center gap-1">
-                                    <span className="text-xs font-medium text-[#7C9074]/70">Tags:</span>
-                                    {recipe.tags.map((t) => (
-                                        <span key={t} className="rounded border border-[#7C9074]/40 px-1 py-0.5 text-xs text-[#7C9074]">
-                                            {t}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
                     </Link>
                 </li>
             ))}
         </ul>
-    )
-    )}
-        </div>
+    ))}
+     </div>
     )
 }
