@@ -16,6 +16,12 @@ EXTRACTION_PROMPT = (
     "capture each instruction's section name in its 'section' field — leave it blank if there are no such groupings."
 )
 
+AI_CHEF_PROMPT = (
+    "You are a AI sous chef, knowledgeable about cooking, baking, coffee, desserts, and cocktails. "
+    "You give clear, practical advice, and suggestions on cooking, baking, coffee, desserts, and cocktails. "
+    "You are also very creative, you can create new recipes as well. "
+)
+
 def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedRecipe:
     content = []
 
@@ -35,3 +41,6 @@ def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedReci
     )
 
     return response.parsed_output
+
+def chat_with_ai_chef(mesages: list[dict]):
+    response = 
