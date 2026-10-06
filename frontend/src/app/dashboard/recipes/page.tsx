@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getRecipes } from "@/lib/api";
+import { getRecipes, matchRecipesByIngredients } from "@/lib/api";
+import { match } from "assert";
 
 type Recipe = {
     id: number;
@@ -29,7 +30,7 @@ export default function RecipesPage() {
     }[]>([]);
     const [searching, setSearching] = useState(false);
     const [searchError, setSearchError] = useState<string | null>(null);
-    
+
     useEffect(() => {
         getRecipes()
           .then((data) => setRecipes(data))
@@ -43,6 +44,19 @@ export default function RecipesPage() {
 
     if (loading) return <p className="text-[#7C9074]">Loading recipes...</p>
     if (error) return <p className="text-red-600">{error}</p>
+
+    async function handleSearch() {
+        setSearching(true);
+
+        try {
+            const results = await matchRecipesByIngredients(haveIngredients);
+            setMatchResults(results);
+        } catch (err) {
+            setSearchError(err instanceof Error ? err.message : "No recipes found");
+        } finally {
+            setSearching(false);
+        }
+    }
 
     return (
         <div className="space-y-4">
