@@ -109,6 +109,15 @@ export default function RecipesPage() {
                     </div>
                 </div>
             )}
+            <button
+                type="button"
+                onClick={handleSearch}
+                disabled={searching || haveIngredients.length === 0}
+                className="mt-3 rounded-md border border-[#7C9074] px-4 py-2 text-sm font-medium text-[#7C9074] hover:bg-[#7C9074] hover:text-white disabled:opacity-50"
+            >
+                {searching ? "Searching..." : "Search"}
+            </button>
+            {searchError && <p className="mt-2 text-sm text-red-600">{searchError}</p>}
     {filteredRecipes.length === 0 ? (
         <p className="text-[#7C9074]/70">No recipes found.</p>
     ) : (
