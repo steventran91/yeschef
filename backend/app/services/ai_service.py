@@ -2,6 +2,7 @@ import json
 import base64
 import anthropic
 from app.schemas.recipe_import import ExtractedRecipe
+from app.schemas.chat import RecipeCard
 from sqlalchemy.orm import Session
 from app.services.search_service import match_recipes_by_ingredients, search_recipes_by_keyword
 
@@ -77,7 +78,7 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
     )
     if response.stop_reason != "tool_use":
         reply_text = next(block.text for block in response.content if block.type == "text")
-        return reply_text
+        return {"reply": reply_text, "recipes": None}
     else:
         for block in response.content:
             if block.type == "tool_use":
@@ -86,7 +87,7 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
                     "role": "assistant", "content": response.content
                 })
                 messages.append({
-                    "role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": tool_result}]
+                    "role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": json.dumps([r.model_dump() for r in tool_result])}]
                 })
 
     final_response = client.messages.create(
@@ -96,22 +97,22 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
         tools=[SEARCH_RECIPES_BY_INGREDIENTS_TOOL, SEARCH_RECIPES_BY_KEYWORD],
         messages=messages,
     )
-    return next(block.text for block in final_response.content if block.type == "text")
+    return {"reply": next(block.text for block in final_response.content if block.type == "text"), "recipes": tool_result}
 
-def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id: int) -> str:
+def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id: int) -> list[RecipeCard]:
     recipes = []
     if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL["name"]:
         results = match_recipes_by_ingredients(db, user_id, tool_input["ingredients"])
         for res in results:
-            recipes.append({"id": res.recipe.id, "title": res.recipe.title, "cuisine": res.recipe.cuisine})
+            recipes.append(RecipeCard(id=res.recipe.id, title=res.recipe.title))
     elif tool_name ==  SEARCH_RECIPES_BY_KEYWORD["name"]:
         results = search_recipes_by_keyword(db, user_id, tool_input["keyword"])
         for res in results:
-            recipes.append({"id": res.id, "title": res.title, "cuisine": res.cuisine})
+            recipes.append(RecipeCard(id=res.id, title=res.title))
     else:
         return None
 
-    return json.dumps(recipes)
+    return recipes
 
    
     

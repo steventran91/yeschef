@@ -56,7 +56,6 @@ def search_recipes_by_keyword(db: Session, user_id: int, keyword: str) -> list[R
 
     return filtered_recipes
 
-def ex
 
 
 

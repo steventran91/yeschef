@@ -6,3 +6,11 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     messages: list[ChatMessage]
+
+class RecipeCard(BaseModel):
+    id: int
+    title: str 
+
+class ChatResponse(BaseModel):
+    reply: str
+    recipes: list[RecipeCard] | None 
