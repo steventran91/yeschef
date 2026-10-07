@@ -27,9 +27,9 @@ AI_CHEF_PROMPT = (
     "You are also very creative, you can create new recipes as well. "
 )
 
-SEARCH_RECIPES_BY_INGREDIENTS_TOOL = {
+SEARCH_RECIPES_BY_INGREDIENTS = {
     "name": "search_recipes_by_ingredients_tool",
-    "description": "Search the user's saved recipes by which ingredients they have on hand.",
+    "description": "Search the user's saved recipes by which ingredients they have on hand. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recieps, they'll be show separately",
     "input_schema": {
         "type": "object",
         "properties": {"ingredients": {"type": "array", "items": {"type": "string"}, "description": "..."}},
@@ -40,7 +40,7 @@ SEARCH_RECIPES_BY_INGREDIENTS_TOOL = {
 
 SEARCH_RECIPES_BY_KEYWORD = {
     "name": "search_recipes_by_keyword",
-    "description": "Search user's saved recipes by keyword. Example, user inputs Vietnamese, search for Vietnamese in the title or cuisine.",
+    "description": "Search user's saved recipes by keyword. Example, user inputs Vietnamese, search for Vietnamese in the title or cuisine. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recieps, they'll be show separately",
     "input_schema": {
         "type": "object",
         "properties": {"keyword": {"type": "string", "description": "..."}},
@@ -73,7 +73,7 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
         model="claude-opus-5",
         max_tokens=4096,
         system=AI_CHEF_PROMPT,
-        tools = [SEARCH_RECIPES_BY_INGREDIENTS_TOOL, SEARCH_RECIPES_BY_KEYWORD],
+        tools = [SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD],
         messages=messages,
     )
     if response.stop_reason != "tool_use":
@@ -94,14 +94,14 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
         model="claude-opus-5",
         max_tokens=4096,
         system=AI_CHEF_PROMPT,
-        tools=[SEARCH_RECIPES_BY_INGREDIENTS_TOOL, SEARCH_RECIPES_BY_KEYWORD],
+        tools=[SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD],
         messages=messages,
     )
     return {"reply": next(block.text for block in final_response.content if block.type == "text"), "recipes": tool_result}
 
 def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id: int) -> list[RecipeCard]:
     recipes = []
-    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL["name"]:
+    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS["name"]:
         results = match_recipes_by_ingredients(db, user_id, tool_input["ingredients"])
         for res in results:
             recipes.append(RecipeCard(id=res.recipe.id, title=res.recipe.title))

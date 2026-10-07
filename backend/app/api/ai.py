@@ -5,7 +5,7 @@ from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User 
 from app.schemas.recipe_import import ExtractedRecipe
-from app.schemas.chat import ChatMessage, ChatRequest
+from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse
 from app.services import ai_service
 from sqlalchemy.orm import Session
 
@@ -43,7 +43,7 @@ async def extract_recipe_image(files: list[UploadFile] = File(...), current_user
         print(e)
         raise HTTPException(status_code=502, detail="AI extraction failed. Please try again or enter the recipe manually.")
 
-@router.post("/chat")
+@router.post("/chat", response_model=ChatResponse)
 def chat(data: ChatRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     messages = []
 
