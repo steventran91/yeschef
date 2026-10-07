@@ -1,6 +1,9 @@
 import base64
 import anthropic
 from app.schemas.recipe_import import ExtractedRecipe
+from sqlalchemy.orm import Session
+from app.services.search_service import match_recipes_by_ingredients, search_recipes_by_keyword
+
 
 client = anthropic.Anthropic()
 
@@ -21,6 +24,27 @@ AI_CHEF_PROMPT = (
     "You give clear, practical advice, and suggestions on cooking, baking, coffee, desserts, and cocktails. "
     "You are also very creative, you can create new recipes as well. "
 )
+
+SEARCH_RECIPES_BY_INGREDIENTS_TOOL = {
+    "name": "search_recipes_by_ingredients_tool",
+    "description": "Search the user's saved recipes by which ingredients they have on hand.",
+    "input_schema": {
+        "type": "object",
+        "properties": {"ingredients": {"type": "array", "items": {"type": "string"}, "description": "..."}},
+        "required": ["ingredients"],
+    }
+
+}
+
+SEARCH_RECIPES_BY_KEYWORD = {
+    "name": "search_recipes_by_keyword",
+    "description": "Search user's saved recipes by keyword. Example, user inputs Vietnamese, search for Vietnamese in the title or cuisine.",
+    "input_schema": {
+        "type": "object",
+        "properties": {"keyword": {"type": "string", "description": "..."}},
+        "required": ["keyword"],
+    }
+}
 
 def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedRecipe:
     content = []
@@ -51,3 +75,9 @@ def chat_with_ai_chef(messages: list[dict]):
     )
     reply_text = next(block.text for block in response.content if block.type == "text")
     return reply_text
+
+def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id:int) -> str:
+    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL:
+        results = match_recipes_by_ingredients(db, user_id, tool_input["ingredients"])
+    if tool_name == SEARCH_RECIPES_BY_KEYWORD:
+        results = search_recipes_by_keyword(db, user_id, tool_input["keyword"])

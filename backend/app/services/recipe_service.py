@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.recipe import Recipe, RecipeIngredient, RecipeInstruction
 from app.schemas.recipe import RecipeCreate, RecipeUpdate
 
+
 def create_recipe(db: Session, data: RecipeCreate, user_id: int) -> Recipe:
     recipe = Recipe(
         user_id=user_id,
@@ -96,17 +97,6 @@ def update_recipe(db: Session, recipe_id: int, user_id: int, data: RecipeUpdate)
     db.commit()
     db.refresh(recipe)
     return recipe 
-
-def search_recipes_by_keyword(db: Session, user_id: int, keyword: str) -> list[Recipe]:
-    filtered_recipes = []
-    recipes = list_recipes(db, user_id, include_archived=False)
-
-    for recipe in recipes:
-        cuisines = [c.lower() for c in recipe.cuisine]
-        if keyword.lower() in recipe.title.lower() or any(keyword.lower() in c for c in cuisines):
-            filtered_recipes.append(recipe)
-
-    return filtered_recipes
 
 
 def archive_recipe(db: Session, recipe_id: int, user_id: int) -> Recipe | None:
