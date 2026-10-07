@@ -1,3 +1,4 @@
+import json
 import base64
 import anthropic
 from app.schemas.recipe_import import ExtractedRecipe
@@ -77,7 +78,19 @@ def chat_with_ai_chef(messages: list[dict]):
     return reply_text
 
 def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id:int) -> str:
-    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL:
+    recipes = []
+    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL["name"]:
         results = match_recipes_by_ingredients(db, user_id, tool_input["ingredients"])
-    if tool_name == SEARCH_RECIPES_BY_KEYWORD:
+        for res in results:
+            recipes.append({"id": res.recipe.id, "title": res.recipe.title, "cuisine": res.recipe.cuisine})
+    elif tool_name ==  SEARCH_RECIPES_BY_KEYWORD["name"]:
         results = search_recipes_by_keyword(db, user_id, tool_input["keyword"])
+        for res in results:
+            recipes.append({"id": res.id, "title": res.title, "cuisine": res.cuisine})
+    else:
+        return None
+
+    return json.dumps(recipes)
+
+   
+    
