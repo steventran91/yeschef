@@ -42,5 +42,12 @@ def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedReci
 
     return response.parsed_output
 
-def chat_with_ai_chef(mesages: list[dict]):
-    response = 
+def chat_with_ai_chef(messages: list[dict]):
+    response = client.messages.create(
+        model="claude-opus-5",
+        max_tokens=4096,
+        system=AI_CHEF_PROMPT,
+        messages=messages,
+    )
+    reply_text = next(block.text for block in response.content if block.type == "text")
+    return reply_text

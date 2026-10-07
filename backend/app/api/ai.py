@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from app.api.deps import get_current_user
 from app.models.user import User 
 from app.schemas.recipe_import import ExtractedRecipe
+from app.schemas.chat import ChatMessage, ChatRequest
 from app.services import ai_service
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -39,4 +40,23 @@ async def extract_recipe_image(files: list[UploadFile] = File(...), current_user
     except anthropic.APIStatusError as e:
         print(e)
         raise HTTPException(status_code=502, detail="AI extraction failed. Please try again or enter the recipe manually.")
+
+@router.post("/chat")
+def chat(data: ChatRequest, current_user: User = Depends(get_current_user)):
+    messages = []
+
+    for m in data.messages:
+        messages.append({"role": m.role, "content": m.content})
+
+    try:
+        return ai_service.chat_with_ai_chef(messages)
+    except anthropic.APIConnectionError as e:
+        print(e)
+        raise HTTPException(status_code=502, detail="Could not reach the AI service, Please try again.")
+    except anthropic.RateLimitError as e:
+        print(e)
+        raise HTTPException(status_code=429, detail="AI service rate limit reached. Please try again shortly.")
+    except anthropic.APIStatusError as e:
+        print(e)
+        raise HTTPException(status_code=502, detail="AI chat failed. Please try again or re-enter your message.")
     
