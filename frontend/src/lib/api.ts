@@ -143,3 +143,10 @@ export function matchRecipesByIngredients(ingredients: string[]) {
         body: JSON.stringify({ingredients})
     });
 }
+
+export function chatWithAI(messages: {role: string, content: string}[]) {
+    return apiFetch("/ai/chat", {
+        method: "POST",
+        body: JSON.stringify({messages})
+    });
+}

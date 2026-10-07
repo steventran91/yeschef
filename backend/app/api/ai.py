@@ -52,7 +52,7 @@ def chat(data: ChatRequest, current_user: User = Depends(get_current_user)):
         return ai_service.chat_with_ai_chef(messages)
     except anthropic.APIConnectionError as e:
         print(e)
-        raise HTTPException(status_code=502, detail="Could not reach the AI service, Please try again.")
+        raise HTTPException(status_code=502, detail="Could not reach the AI service. Please try again.")
     except anthropic.RateLimitError as e:
         print(e)
         raise HTTPException(status_code=429, detail="AI service rate limit reached. Please try again shortly.")
