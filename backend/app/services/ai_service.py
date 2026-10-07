@@ -67,17 +67,38 @@ def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedReci
 
     return response.parsed_output
 
-def chat_with_ai_chef(messages: list[dict]):
+def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
     response = client.messages.create(
         model="claude-opus-5",
         max_tokens=4096,
         system=AI_CHEF_PROMPT,
+        tools = [SEARCH_RECIPES_BY_INGREDIENTS_TOOL, SEARCH_RECIPES_BY_KEYWORD],
         messages=messages,
     )
-    reply_text = next(block.text for block in response.content if block.type == "text")
-    return reply_text
+    if response.stop_reason != "tool_use":
+        reply_text = next(block.text for block in response.content if block.type == "text")
+        return reply_text
+    else:
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_result = execute_tool(block.name, block.input, db, user_id)
+                messages.append({
+                    "role": "assistant", "content": response.content
+                })
+                messages.append({
+                    "role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": tool_result}]
+                })
 
-def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id:int) -> str:
+    final_response = client.messages.create(
+        model="claude-opus-5",
+        max_tokens=4096,
+        system=AI_CHEF_PROMPT,
+        tools=[SEARCH_RECIPES_BY_INGREDIENTS_TOOL, SEARCH_RECIPES_BY_KEYWORD],
+        messages=messages,
+    )
+    return next(block.text for block in final_response.content if block.type == "text")
+
+def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id: int) -> str:
     recipes = []
     if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL["name"]:
         results = match_recipes_by_ingredients(db, user_id, tool_input["ingredients"])
