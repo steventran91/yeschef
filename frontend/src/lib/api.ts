@@ -144,7 +144,7 @@ export function matchRecipesByIngredients(ingredients: string[]) {
     });
 }
 
-export function chatWithAI(messages: {role: string, content: string}[]) {
+export function chatWithAI(messages: {role: string, content: string}[]): Promise<{reply: string, recipes: {id: number, title: string}[] | null}> {
     return apiFetch("/ai/chat", {
         method: "POST",
         body: JSON.stringify({messages})

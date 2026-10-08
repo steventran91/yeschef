@@ -3,7 +3,7 @@ import { chatWithAI } from "@/lib/api";
 import { useState } from "react"
 
 export default function ChatPage() {
-    const [messages, setMessages] = useState<{role: "user" | "assistant", content: string}[]>([]);
+    const [messages, setMessages] = useState<{role: "user" | "assistant", content: string, recipes?: {id: number, title: string}[]}[]>([]);
     const [input, setInput] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -16,8 +16,8 @@ export default function ChatPage() {
         setLoading(true);
 
         try {
-            const reply = await chatWithAI(updatedMessages);
-            setMessages([...updatedMessages, {role: "assistant" as const, content: reply}])
+            const response = await chatWithAI(updatedMessages);
+            setMessages([...updatedMessages, {role: "assistant" as const, content: response.reply, recipes: response.recipes ?? undefined}])
         } catch (err) {
             setMessages([...updatedMessages, {role: "assistant" as const, content: "Unable to process messages right now. Please try again."}])
         } finally {
