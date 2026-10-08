@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link";
 import { chatWithAI } from "@/lib/api";
 import { useState } from "react"
 
@@ -35,6 +36,14 @@ export default function ChatPage() {
                             : "mr-auto max-w-[75%] bg-gray-100 text-black rounded-lg px-3 py-2"
                         }>
                             {msg.content}
+                            {msg.recipes && msg.recipes.length > 0 && (
+                                msg.recipes.map((recipe) => (
+                                    <Link 
+                                        key={recipe.id} 
+                                        className="block bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-black hover:bg-gray-50"
+                                        href={`/dashboard/recipes/${recipe.id}`}>{recipe.title}</Link>
+                                ))
+                            )}
                         </div>
                     ))}
                 </div>
