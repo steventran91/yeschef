@@ -26,6 +26,7 @@ AI_CHEF_PROMPT = (
     "You are a AI sous chef, knowledgeable about cooking, baking, coffee, desserts, and cocktails. "
     "You give clear, practical advice, and suggestions on cooking, baking, coffee, desserts, and cocktails. "
     "You are also very creative, you can create new recipes as well. "
+    "Only use web_search or extract_recipe_from_url when user requests for new recipe or recipe online. "
 )
 
 WEB_EXTRACT_PROMPT = (
@@ -43,6 +44,21 @@ SEARCH_RECIPES_BY_INGREDIENTS = {
         "required": ["ingredients"],
     }
 
+}
+
+EXTRACT_RECIPE_FROM_URL_TOOL = {
+    "name": "extract_recipe_from_url",
+    "description": "Extract data from url passed from web_search_tool and returns structured data (recipe). Once a recipe is found, reply with a short line (e.g. Found a recipe: Pho Ga).",
+    "input_schema": {
+        "type": "object",
+        "properties": {"url": {"type": "string", "description": "..."}},
+        "required": ["url"],
+    }
+}
+
+WEB_SEARCH_TOOL = {
+    # searches the web for recipes and returns a url. URL then gets passed to extract_recipe_from_url to be parsed and returns structured data.
+    "type": "web_search_20250305", "name": "web_search", "max_uses": 3
 }
 
 SEARCH_RECIPES_BY_KEYWORD = {
@@ -81,7 +97,7 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
         model="claude-opus-5",
         max_tokens=4096,
         system=AI_CHEF_PROMPT,
-        tools = [SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD],
+        tools = [SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD, EXTRACT_RECIPE_FROM_URL_TOOL, WEB_SEARCH_TOOL],
         messages=messages,
     )
     if response.stop_reason != "tool_use":
@@ -102,7 +118,7 @@ def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
         model="claude-opus-5",
         max_tokens=4096,
         system=AI_CHEF_PROMPT,
-        tools=[SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD],
+        tools=[SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD, EXTRACT_RECIPE_FROM_URL_TOOL, WEB_SEARCH_TOOL],
         messages=messages,
     )
     return {"reply": next(block.text for block in final_response.content if block.type == "text"), "recipes": tool_result}
