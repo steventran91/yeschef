@@ -35,8 +35,8 @@ WEB_EXTRACT_PROMPT = (
     "Do not extract unrelated contents like navigations, ads, comments, etc. "
 )
 
-SEARCH_RECIPES_BY_INGREDIENTS = {
-    "name": "search_recipes_by_ingredients_tool",
+SEARCH_RECIPES_BY_INGREDIENTS_TOOL = {
+    "name": "search_recipes_by_ingredients",
     "description": "Search the user's saved recipes by which ingredients they have on hand. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recieps, they'll be show separately",
     "input_schema": {
         "type": "object",
@@ -61,7 +61,7 @@ WEB_SEARCH_TOOL = {
     "type": "web_search_20250305", "name": "web_search", "max_uses": 3
 }
 
-SEARCH_RECIPES_BY_KEYWORD = {
+SEARCH_RECIPES_BY_KEYWORD_TOOL = {
     "name": "search_recipes_by_keyword",
     "description": "Search user's saved recipes by keyword. Example, user inputs Vietnamese, search for Vietnamese in the title or cuisine. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recieps, they'll be show separately",
     "input_schema": {
@@ -93,46 +93,50 @@ def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedReci
     return response.parsed_output
 
 def chat_with_ai_chef(messages: list[dict], db: Session, user_id: int):
-    response = client.messages.create(
-        model="claude-opus-5",
-        max_tokens=4096,
-        system=AI_CHEF_PROMPT,
-        tools = [SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD, EXTRACT_RECIPE_FROM_URL_TOOL, WEB_SEARCH_TOOL],
-        messages=messages,
-    )
-    if response.stop_reason != "tool_use":
-        reply_text = next(block.text for block in response.content if block.type == "text")
-        return {"reply": reply_text, "recipes": None}
-    else:
-        for block in response.content:
-            if block.type == "tool_use":
-                tool_result = execute_tool(block.name, block.input, db, user_id)
-                messages.append({
-                    "role": "assistant", "content": response.content
-                })
-                messages.append({
-                    "role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": json.dumps([r.model_dump() for r in tool_result])}]
-                })
+    recipes = None
+    pending_recipe = None
+    while True:
+        response = client.messages.create(
+            model="claude-opus-5",
+            max_tokens=4096,
+            system=AI_CHEF_PROMPT,
+            tools = [SEARCH_RECIPES_BY_INGREDIENTS_TOOL, SEARCH_RECIPES_BY_KEYWORD_TOOL, EXTRACT_RECIPE_FROM_URL_TOOL, WEB_SEARCH_TOOL],
+            messages=messages,
+        )
+        if response.stop_reason != "tool_use":
+            reply_text = next(block.text for block in response.content if block.type == "text")
+            return {"reply": reply_text, "recipes": recipes, "pending_recipe": pending_recipe}
+        else:
+            messages.append({
+                "role": "assistant", "content": response.content
+            })
+            for block in response.content:
+                if block.type == "tool_use":
+                    tool_result = execute_tool(block.name, block.input, db, user_id)
 
-    final_response = client.messages.create(
-        model="claude-opus-5",
-        max_tokens=4096,
-        system=AI_CHEF_PROMPT,
-        tools=[SEARCH_RECIPES_BY_INGREDIENTS, SEARCH_RECIPES_BY_KEYWORD, EXTRACT_RECIPE_FROM_URL_TOOL, WEB_SEARCH_TOOL],
-        messages=messages,
-    )
-    return {"reply": next(block.text for block in final_response.content if block.type == "text"), "recipes": tool_result}
+                    if block.name == EXTRACT_RECIPE_FROM_URL_TOOL["name"]:
+                        pending_recipe = tool_result
+                        tool_result_json = json.dumps(tool_result.model_dump())
+                    else:
+                        recipes = tool_result
+                        tool_result_json = json.dumps([r.model_dump()  for r in tool_result])
+                    messages.append({
+                        "role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": tool_result_json}]
+                    })
+
 
 def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id: int) -> list[RecipeCard]:
     recipes = []
-    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS["name"]:
+    if tool_name == SEARCH_RECIPES_BY_INGREDIENTS_TOOL["name"]:
         results = match_recipes_by_ingredients(db, user_id, tool_input["ingredients"])
         for res in results:
             recipes.append(RecipeCard(id=res.recipe.id, title=res.recipe.title))
-    elif tool_name ==  SEARCH_RECIPES_BY_KEYWORD["name"]:
+    elif tool_name ==  SEARCH_RECIPES_BY_KEYWORD_TOOL["name"]:
         results = search_recipes_by_keyword(db, user_id, tool_input["keyword"])
         for res in results:
             recipes.append(RecipeCard(id=res.id, title=res.title))
+    elif tool_name == EXTRACT_RECIPE_FROM_URL_TOOL["name"]:
+        return extract_recipe_from_url(tool_input["url"])
     else:
         return None
 

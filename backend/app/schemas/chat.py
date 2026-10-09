@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.schemas.recipe_import import ExtractedRecipe
 
 class ChatMessage(BaseModel):
     role: str
@@ -14,3 +15,4 @@ class RecipeCard(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     recipes: list[RecipeCard] | None 
+    pending_recipe: ExtractedRecipe | None 
