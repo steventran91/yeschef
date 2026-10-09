@@ -48,7 +48,7 @@ SEARCH_RECIPES_BY_INGREDIENTS_TOOL = {
 
 EXTRACT_RECIPE_FROM_URL_TOOL = {
     "name": "extract_recipe_from_url",
-    "description": "Extract data from url passed from web_search_tool and returns structured data (recipe). Once a recipe is found, reply with a short line (e.g. Found a recipe: Pho Ga).",
+    "description": "Extract data from url passed from web_search_tool and returns structured data (recipe). Once a recipe is found, reply with one short line only (e.g. 'Found a recipe: Pho Ga') and nothing else — no cooking tips, no ingredient commentary, no instructions. The full recipe will be shown separately as a preview.",
     "input_schema": {
         "type": "object",
         "properties": {"url": {"type": "string", "description": "..."}},
@@ -63,7 +63,7 @@ WEB_SEARCH_TOOL = {
 
 SEARCH_RECIPES_BY_KEYWORD_TOOL = {
     "name": "search_recipes_by_keyword",
-    "description": "Search user's saved recipes by keyword. Example, user inputs Vietnamese, search for Vietnamese in the title or cuisine. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recieps, they'll be show separately",
+    "description": "Search user's saved recipes by keyword. Example, user inputs Vietnamese, search for Vietnamese in the title or cuisine. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recipes, they'll be show separately",
     "input_schema": {
         "type": "object",
         "properties": {"keyword": {"type": "string", "description": "..."}},
