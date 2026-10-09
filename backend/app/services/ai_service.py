@@ -1,6 +1,7 @@
 import json
 import base64
 import anthropic
+import httpx
 from app.schemas.recipe_import import ExtractedRecipe
 from app.schemas.chat import RecipeCard
 from sqlalchemy.orm import Session
@@ -27,6 +28,12 @@ AI_CHEF_PROMPT = (
     "You are also very creative, you can create new recipes as well. "
 )
 
+WEB_EXTRACT_PROMPT = (
+    "Extract the recipe from the raw page text/url. Only extract the name of the dish, cook time, prep time, "
+    "ingredients, and instructions. "
+    "Do not extract unrelated contents like navigations, ads, comments, etc. "
+)
+
 SEARCH_RECIPES_BY_INGREDIENTS = {
     "name": "search_recipes_by_ingredients_tool",
     "description": "Search the user's saved recipes by which ingredients they have on hand. If results are returned, reply with one short line (e.g. '2 recipes found) and nothing else - do not list or describe the recieps, they'll be show separately",
@@ -47,6 +54,7 @@ SEARCH_RECIPES_BY_KEYWORD = {
         "required": ["keyword"],
     }
 }
+
 
 def extract_recipe_from_images(images: list[tuple[bytes, str]]) -> ExtractedRecipe:
     content = []
@@ -113,6 +121,20 @@ def execute_tool(tool_name: str, tool_input: dict, db: Session, user_id: int) ->
         return None
 
     return recipes
+
+def extract_recipe_from_url(url: str) -> ExtractedRecipe:
+    raw_text = httpx.get(url, timeout=10, follow_redirects=True).text 
+    response = client.messages.parse(
+        model="claude-opus-5",
+        max_tokens=4096,
+        system=WEB_EXTRACT_PROMPT,
+        messages=[{"role": "user", "content": raw_text}],
+        output_format=ExtractedRecipe,
+    )
+    return response.parsed_output
+
+
+
 
    
     
