@@ -18,9 +18,10 @@ type RecipeCreateFormProps = {
         instructions?: {text: string; section?: string;}[];
     };
     recipeId?: number;
+    onSuccess?: (recipeId: number) => void
 }
 
-function RecipeCreateForm({initialData, recipeId} : RecipeCreateFormProps) {
+function RecipeCreateForm({initialData, recipeId, onSuccess}: RecipeCreateFormProps) {
     const router = useRouter();
 
     const [title, setTitle] = useState(initialData?.title ?? "");
@@ -89,10 +90,19 @@ function RecipeCreateForm({initialData, recipeId} : RecipeCreateFormProps) {
             
             if (recipeId) {
                 await updateRecipe(recipeId, payload);
-                router.push(`/dashboard/recipes/${recipeId}`);
+                if (onSuccess) {
+                    onSuccess(recipeId)
+
+                } else{
+                    router.push(`/dashboard/recipes/${recipeId}`);
+                }
             } else {
                 const created = await createRecipe(payload);
-                router.push(`/dashboard/recipes/${created.id}`)
+                if (onSuccess) {
+                    onSuccess(created.id)
+                } else {
+                    router.push(`/dashboard/recipes/${created.id}`);
+                }
             }
         } catch (err) {
             setError(err instanceof Error ? err.message: "Failed to save recipe.");

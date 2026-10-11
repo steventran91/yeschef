@@ -4,9 +4,21 @@ import { chatWithAI } from "@/lib/api";
 import { useState } from "react"
 
 export default function ChatPage() {
-    const [messages, setMessages] = useState<{role: "user" | "assistant", content: string, recipes?: {id: number, title: string}[]}[]>([]);
+    const [messages, setMessages] = useState<{role: "user" | "assistant", content: string, recipes?: {id: number, title: string}[]; pending_recipe?: {title?: string; description?: string; servings?: number; prep_time_minutes?: number; cook_time_minutes?: number; cuisine?: string[]; tags?: string[]; ingredients?: {name: string; original_text?: string; quantity?: number; unit?: string; preparation?: string; section?: string, is_optional?: boolean}[]; instructions?: {text: string; section?: string;}[]}}[]>([]);
     const [input, setInput] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [previewRecipe, setPreviewRecipe] = useState<{
+        title?: string;
+        description?: string;
+        servings?: number;
+        prep_time_minutes?: number;
+        cook_time_minutes?: number;
+        cuisine?: string[];
+        tags?: string[];
+        ingredients?: {name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string; is_optional?: boolean}[]
+        instructions?: {text: string; section?: string;}[];
+    } | null>(null);
 
     async function handleSend() {
         if (input.trim() === "") return;
@@ -18,7 +30,7 @@ export default function ChatPage() {
 
         try {
             const response = await chatWithAI(updatedMessages);
-            setMessages([...updatedMessages, {role: "assistant" as const, content: response.reply, recipes: response.recipes ?? undefined}])
+            setMessages([...updatedMessages, {role: "assistant" as const, content: response.reply, recipes: response.recipes ?? undefined, pending_recipe: response.pending_recipe ?? undefined}])
         } catch (err) {
             setMessages([...updatedMessages, {role: "assistant" as const, content: "Unable to process messages right now. Please try again."}])
         } finally {
