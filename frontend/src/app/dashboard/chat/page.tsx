@@ -4,9 +4,12 @@ import { chatWithAI } from "@/lib/api";
 import { useState } from "react"
 import Modal from "@/components/Modal";
 import RecipeCreateForm from "@/components/RecipeCreateForm";
+import { useRouter } from "next/navigation";
+
 
 export default function ChatPage() {
-    const [messages, setMessages] = useState<{role: "user" | "assistant", content: string, recipes?: {id: number, title: string}[]; pending_recipe?: {title?: string; description?: string; servings?: number; prep_time_minutes?: number; cook_time_minutes?: number; cuisine?: string[]; tags?: string[]; ingredients?: {name: string; original_text?: string; quantity?: number; unit?: string; preparation?: string; section?: string, is_optional?: boolean}[]; instructions?: {text: string; section?: string;}[]}}[]>([]);
+    const router = useRouter();
+    const [messages, setMessages] = useState<{role: "user" | "assistant", content: string, recipes?: {id: number, title: string}[]; pending_recipe?: {title?: string; description?: string; servings?: number; prep_time_minutes?: number; cook_time_minutes?: number; cuisine?: string[]; tags?: string[]; ingredients?: {name: string; original_text: string; quantity?: number; unit?: string; preparation?: string; section?: string, is_optional?: boolean}[]; instructions?: {text: string; section?: string;}[]}}[]>([]);
     const [input, setInput] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -74,7 +77,7 @@ export default function ChatPage() {
                     ))}
                 </div>
 
-            {loading && <p className="text-sm text-gray-400 italic">Thinking...</p>}
+            {loading && <p className="text-sm text-gray-400 italic">Searching...</p>}
 
             <div className="flex gap-2">
                 <input 
@@ -94,7 +97,7 @@ export default function ChatPage() {
                     {previewRecipe && (
                         <RecipeCreateForm
                             initialData={previewRecipe}
-                            onSuccess={() => {setModalOpen(false); setPreviewRecipe(null);}}
+                            onSuccess={(recipeId) => {setModalOpen(false); setPreviewRecipe(null); router.push(`/dashboard/recipes/${recipeId}`)}}
                         />
                     )}
             </Modal>
