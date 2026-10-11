@@ -6,7 +6,7 @@ Import a recipe from a photo or a URL, let AI clean and categorize it, then sear
 
 ## Status
 
-🚧 In active development. Core recipe management, AI-powered import, ingredient search, and a tool-using AI chat are live; cook mode and chat-driven recipe discovery/import from the web are in progress.
+🚧 In active development. Core recipe management, AI-powered import, ingredient search, and a tool-using AI chat (including web recipe discovery) are live; cook mode is next.
 
 ## Features
 
@@ -18,6 +18,7 @@ Import a recipe from a photo or a URL, let AI clean and categorize it, then sear
 - **Ingredient-based search** — find saved recipes by which ingredients you have on hand, ranked by match percentage, with optional ingredients excluded from matching.
 - **AI chat** — a conversational AI chef (Claude) for general cooking/baking/cocktail questions and advice.
 - **Chat tool-calling** — the chat AI can search your own saved recipes (by ingredient or by title/cuisine keyword) and surface them as clickable recipe cards, routing straight to the recipe's detail page.
+- **Chat-driven web recipe discovery** — ask for a new recipe and the AI chef searches the web, extracts it into the same structured format as photo import, and lets you preview/edit and save it before it becomes a real recipe in your library.
 
 ## Stack
 
@@ -40,4 +41,4 @@ Setup instructions will be added once the project is ready for others to run loc
 
 ## Roadmap
 
-Next up: letting the chat AI search the web for new recipes (not just your saved ones) and preview/save them before cooking. Looking further ahead: a cook-mode experience with live, chat-driven recipe adjustments (substitutions, scaling) synced to an interactive checklist, plus personalization and pantry tracking.
+Next up: a cook-mode experience with live, chat-driven recipe adjustments (substitutions, scaling) synced to an interactive checklist, plus personalization and pantry tracking.
