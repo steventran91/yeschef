@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { chatWithAI } from "@/lib/api";
 import { useState } from "react"
+import Modal from "@/components/Modal";
+import RecipeCreateForm from "@/components/RecipeCreateForm";
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<{role: "user" | "assistant", content: string, recipes?: {id: number, title: string}[]; pending_recipe?: {title?: string; description?: string; servings?: number; prep_time_minutes?: number; cook_time_minutes?: number; cuisine?: string[]; tags?: string[]; ingredients?: {name: string; original_text?: string; quantity?: number; unit?: string; preparation?: string; section?: string, is_optional?: boolean}[]; instructions?: {text: string; section?: string;}[]}}[]>([]);
@@ -56,6 +58,18 @@ export default function ChatPage() {
                                         href={`/dashboard/recipes/${recipe.id}`}>{recipe.title}</Link>
                                 ))
                             )}
+                            {msg.pending_recipe && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setPreviewRecipe(msg.pending_recipe!);
+                                        setModalOpen(true);
+                                    }}
+                                    className="block w-full text-left bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-black hover:bg-gray-50"
+                                >
+                                    {msg.pending_recipe.title ?? "Preview recipe"} - Preview & Save
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -76,6 +90,14 @@ export default function ChatPage() {
                     Send
                 </button>
             </div>
+            <Modal isOpen={modalOpen} onClose={() => {setModalOpen(false); setPreviewRecipe(null);}}>
+                    {previewRecipe && (
+                        <RecipeCreateForm
+                            initialData={previewRecipe}
+                            onSuccess={() => {setModalOpen(false); setPreviewRecipe(null);}}
+                        />
+                    )}
+            </Modal>
         </div>
     )
 }
