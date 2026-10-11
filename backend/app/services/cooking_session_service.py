@@ -8,9 +8,25 @@ def get_cooking_session(db: Session, user_id: int) -> CookingSession | None:
     return session 
 
 def start_cooking_session(db: Session, user_id: int, recipe_id: int) -> CookingSession:
-    # check session already exists for user, reuse logic #1
-    # if it does, update its recipe_id to the new one and reset both checked-ids arrays back to empty 
-    # if it doesn't exist yet, create a new row with empty checked arrays. commit either way and return the session
+    session = get_cooking_session(db, user_id)
+    if session:
+        session.recipe_id = recipe_id
+        session.checked_ingredients_ids = []
+        session.checked_instructions_ids = []
+    else:
+        session = CookingSession(
+            user_id=user_id,
+            recipe_id=recipe_id,
+            checked_ingredients_ids=[],
+            checked_instructions_ids=[],
+        )
+        db.add(session)
+    db.commit()
+    db.refresh(session) 
+    return session 
+
+
+
 
 def update_checked_items(db: Session, user_id: int, checked_ingredients_ids: list[int], checked_instructions_ids: list[int]) -> CookingSession:
     # find the user's existing session, 
