@@ -26,11 +26,7 @@ def start_cooking_session(db: Session, user_id: int, recipe_id: int) -> CookingS
     return session 
 
 
-
-
 def update_checked_items(db: Session, user_id: int, checked_ingredients_ids: list[int], checked_instructions_ids: list[int]) -> CookingSession | None:
-    # find the user's existing session, 
-    # overwrite both arrays with whatever was passed in, commit, return it
     session = get_cooking_session(db, user_id)
     if session is None:
         return None 
@@ -42,7 +38,6 @@ def update_checked_items(db: Session, user_id: int, checked_ingredients_ids: lis
     return session
 
 def end_cooking_session(db: Session, user_id: int) -> None:
-    # find the users session and delete it entirely
     session = get_cooking_session(db, user_id)
     if session:
         db.delete(session)
