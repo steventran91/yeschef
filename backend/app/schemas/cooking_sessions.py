@@ -17,5 +17,5 @@ class StartCookingSessionRequest(BaseModel):
 
 class UpdateCheckedItemsRequest(BaseModel):
 
-    checked_ingredients_ids = list[int]
-    checked_instructions_ids = list[int]
+    checked_ingredients_ids: list[int]
+    checked_instructions_ids: list[int]
